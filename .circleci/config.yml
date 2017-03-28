@@ -9,7 +9,6 @@ jobs:
       - run:
           name: Trigger Jobs
           command: |
-            echo $CIRCLE_API_TOKEN
             function trigger_job() {
               job_name=$1
               curl --user ${CIRCLE_API_TOKEN}: \
@@ -36,8 +35,8 @@ jobs:
       - checkout
       - restore_cache:
           keys:
-            - v1-yarn-{{ .Branch }}
-            - v1-yarn-master
+            - v1-yarn-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}
+            - v1-yarn-master-{{ .Environment.CIRCLE_JOB }}
       - run:
           name: Install dependencies
           command: yarn install --no-lockfile
@@ -49,7 +48,7 @@ jobs:
             # yarn run circleci
             npm run circleci
       - save_cache:
-          key: v1-yarn-{{ .Branch }}-#{{ .BuildNum }}
+          key: v1-yarn-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}-#{{ .BuildNum }}
           paths:
             - ~/.cache/yarn
       - store_test_results:
