@@ -13,7 +13,7 @@ install:
 test_script:
   # Output useful info for debugging.
   - yarn versions
-  - npm versions
+  - npm version
   # run tests
   - yarn test
 
