@@ -8,19 +8,19 @@ const denodeify = require('denodeify');
 const rimraf = denodeify(require('rimraf'));
 const RSA = require('node-rsa');
 
-const packer = require('../src/');
+const cli = require('../src/cli');
 const pluginDir = path.join(__dirname, 'fixtures/sample-plugin/plugin-dir');
 
-describe('packer', () => {
+describe('cli', () => {
   it('is a function', () => {
-    assert(typeof packer === 'function');
+    assert(typeof cli === 'function');
   });
 
   context('generates `plugin.zip` without ppk', () => {
     let zip;
     beforeEach(() =>
       rimraf(`${path.dirname(pluginDir)}/*.*(ppk|zip)`)
-      .then(() => packer(pluginDir))
+      .then(() => cli(pluginDir))
       .then(pluginFile => {
         assert(path.basename(pluginFile) === 'plugin.zip');
         zip = new AdmZip(pluginFile);
