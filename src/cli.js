@@ -18,6 +18,7 @@ const packer = require('./');
  */
 function cli(pluginDir, options) {
   options = options || {};
+  const packerLocal = options.packerMock_ ? options.packerMock_ : packer;
 
   // 1. check if pluginDir is a directory
   if (!fs.statSync(pluginDir).isDirectory()) {
@@ -55,7 +56,7 @@ function cli(pluginDir, options) {
 
     // 6. package plugin.zip
     return createContentsZip(pluginDir)
-      .then(contentsZip => packer(contentsZip, privateKey))
+      .then(contentsZip => packerLocal(contentsZip, privateKey))
       .then(output => {
         if (!ppkFile) {
           fs.writeFileSync(path.join(outputDir, `${output.id}.ppk`), output.privateKey, 'utf8');

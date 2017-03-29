@@ -9,9 +9,9 @@ const sign = require('./sign');
 const uuid = require('./calc-uuid');
 
 /**
- * @param {Buffer} contentsZip The zipped plugin contents directory.
+ * @param {!Buffer} contentsZip The zipped plugin contents directory.
  * @param {string=} privateKey The private key (PKCS#1 PEM).
- * @return {Promise<{plugin: Buffer, privateKey: string, id: string}>}
+ * @return {Promise<{plugin: !Buffer, privateKey: string, id: string}>}
  */
 function packer(contentsZip, privateKey) {
   return Promise.resolve().then(() => {
@@ -26,7 +26,6 @@ function packer(contentsZip, privateKey) {
 
     const signature = sign(contentsZip, privateKey);
     const publicKey = key.exportKey('pkcs8-public-der');
-
     const id = uuid(publicKey);
     debug(`id : ${id}`);
     return zip(contentsZip, publicKey, signature)
@@ -40,7 +39,7 @@ function packer(contentsZip, privateKey) {
  * @param {!Buffer|!stream.Readable|string} contentsZip
  * @param {!Buffer|!stream.Readable|string} publicKey
  * @param {!Buffer|!stream.Readable|string} signature
- * @return {!Promise<Buffer>}
+ * @return {!Promise<!Buffer>}
  */
 function zip(contentsZip, publicKey, signature) {
   return new Promise((res, rej) => {
