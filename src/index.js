@@ -11,7 +11,7 @@ const uuid = require('./calc-uuid');
 /**
  * @param {!Buffer} contentsZip The zipped plugin contents directory.
  * @param {string=} privateKey The private key (PKCS#1 PEM).
- * @return {Promise<{plugin: !Buffer, privateKey: string, id: string}>}
+ * @return {!Promise<{plugin: !Buffer, privateKey: string, id: string}>}
  */
 function packer(contentsZip, privateKey) {
   return Promise.resolve().then(() => {

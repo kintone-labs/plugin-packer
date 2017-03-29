@@ -14,7 +14,7 @@ const packer = require('./');
 /**
  * @param {string} pluginDir path to plugin directory.
  * @param {Object=} options {ppk: string}.
- * @return {Promise<string>} The resolved value is a path to the output plugin zip file.
+ * @return {!Promise<string>} The resolved value is a path to the output plugin zip file.
  */
 function cli(pluginDir, options) {
   options = options || {};

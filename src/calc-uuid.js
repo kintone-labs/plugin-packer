@@ -3,6 +3,10 @@
 const crypto = require('crypto');
 const hex2a = require('./hex2a');
 
+/**
+ * @param {!Buffer} publicKey
+ * @return {string}
+ */
 function uuid(publicKey) {
   const hash = crypto.createHash('sha256');
   hash.update(publicKey);
