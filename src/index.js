@@ -6,7 +6,7 @@ const streamBuffers = require('stream-buffers');
 const debug = require('debug')('packer');
 
 const sign = require('./sign');
-const uuid = require('./calc-uuid');
+const uuid = require('./uuid');
 
 /**
  * @param {!Buffer} contentsZip The zipped plugin contents directory.

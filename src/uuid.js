@@ -1,6 +1,7 @@
 'use strict';
 
 const crypto = require('crypto');
+
 const hex2a = require('./hex2a');
 
 /**
