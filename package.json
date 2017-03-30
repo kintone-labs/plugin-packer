@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "circleci": "run-s test",
-    "css": "cpr node_modules/normalize.css/normalize.css docs/dist/ -o",
+    "css": "cssnano node_modules/normalize.css/normalize.css --safe > docs/dist/normalize.min.css",
     "eslint": "eslint bin src site test",
     "js": "run-s js:browserify js:minify",
     "js:browserify": "browserify site/index.js -i graceful-fs -i glob -i walkdir -i tar-stream -o docs/dist/bundle.js",
@@ -38,6 +38,7 @@
     "adm-zip": "^0.4.7",
     "browserify": "^14.1.0",
     "cpr": "^2.0.2",
+    "cssnano-cli": "^1.0.5",
     "eslint": "^3.18.0",
     "eslint-config-teppeis": "^5.3.0",
     "glob": "^7.1.1",
