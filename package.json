@@ -15,14 +15,14 @@
     "src"
   ],
   "scripts": {
-    "js:minify": "java -jar ./node_modules/google-closure-compiler/compiler.jar --js ./docs/dist/bundle.js --language_out ES6 -O WHITESPACE_ONLY > ./docs/dist/bundle.min.js",
-    "js:browserify": "browserify site/index.js -i graceful-fs -i glob -i walkdir -i tar-stream -o docs/dist/bundle.js",
-    "js": "run-s js:browserify js:minify",
     "circleci": "run-s test",
-    "css:cp": "cpr node_modules/normalize.css/normalize.css docs/dist/ -o",
+    "css": "cpr node_modules/normalize.css/normalize.css docs/dist/ -o",
     "eslint": "eslint bin src site test",
+    "js": "run-s js:browserify js:minify",
+    "js:browserify": "browserify site/index.js -i graceful-fs -i glob -i walkdir -i tar-stream -o docs/dist/bundle.js",
+    "js:minify": "java -jar ./node_modules/google-closure-compiler/compiler.jar --js ./docs/dist/bundle.js --language_out ES6 -O WHITESPACE_ONLY > ./docs/dist/bundle.min.js",
     "mocha": "mocha --require intelli-espower-loader",
-    "site": "run-p css:cp js",
+    "site": "run-p js css",
     "test": "run-s eslint mocha"
   },
   "dependencies": {
