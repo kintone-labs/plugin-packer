@@ -15,12 +15,14 @@
     "src"
   ],
   "scripts": {
-    "browserify": "browserify site/index.js -i graceful-fs -i glob -i walkdir -i tar-stream -o docs/dist/bundle.js",
+    "js:minify": "java -jar ./node_modules/google-closure-compiler/compiler.jar --js ./docs/dist/bundle.js --language_out ES6 -O WHITESPACE_ONLY > ./docs/dist/bundle.min.js",
+    "js:browserify": "browserify site/index.js -i graceful-fs -i glob -i walkdir -i tar-stream -o docs/dist/bundle.js",
+    "js": "run-s js:browserify js:minify",
     "circleci": "run-s test",
-    "cp": "cpr node_modules/normalize.css/normalize.css docs/dist/ -o",
+    "css:cp": "cpr node_modules/normalize.css/normalize.css docs/dist/ -o",
     "eslint": "eslint bin src site test",
     "mocha": "mocha --require intelli-espower-loader",
-    "site": "run-p cp browserify",
+    "site": "run-p css:cp js",
     "test": "run-s eslint mocha"
   },
   "dependencies": {
@@ -34,11 +36,12 @@
   },
   "devDependencies": {
     "adm-zip": "^0.4.7",
-    "cpr": "^2.0.2",
     "browserify": "^14.1.0",
+    "cpr": "^2.0.2",
     "eslint": "^3.18.0",
     "eslint-config-teppeis": "^5.3.0",
     "glob": "^7.1.1",
+    "google-closure-compiler": "^20170218.0.0",
     "intelli-espower-loader": "^1.0.1",
     "mocha": "^3.2.0",
     "normalize.css": "^6.0.0",
