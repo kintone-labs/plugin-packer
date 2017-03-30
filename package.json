@@ -16,12 +16,12 @@
   ],
   "scripts": {
     "browserify": "browserify site/index.js --ignore graceful-fs -o docs/dist/bundle.js",
-    "circleci": "npm run test",
+    "circleci": "run-s test",
     "cp": "cpr node_modules/normalize.css/normalize.css docs/dist/ -o",
     "eslint": "eslint bin src site test",
     "mocha": "mocha --require intelli-espower-loader",
-    "site": "npm run cp && npm run browserify",
-    "test": "npm run eslint && npm run mocha"
+    "site": "run-p cp browserify",
+    "test": "run-s eslint mocha"
   },
   "dependencies": {
     "archiver": "^1.3.0",
@@ -42,6 +42,7 @@
     "intelli-espower-loader": "^1.0.1",
     "mocha": "^3.2.0",
     "normalize.css": "^6.0.0",
+    "npm-run-all": "^4.0.2",
     "power-assert": "^1.4.2",
     "rimraf": "^2.6.1",
     "setimmediate": "^1.0.5",
