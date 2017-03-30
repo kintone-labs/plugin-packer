@@ -65399,9 +65399,9 @@ ZipStream.prototype.finalize = function() {
 },{"archiver-utils":2,"compress-commons":78,"util":243}],249:[function(require,module,exports){
 'use strict';
 
+require('setimmediate'); // polyfill
 const Buffer = require('buffer').Buffer;
 const packer = require('../src/');
-require('setimmediate'); // polyfill
 
 // eslint-disable-next-line id-match
 const $ = document.querySelector.bind(document);
