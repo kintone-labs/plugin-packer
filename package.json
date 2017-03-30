@@ -15,7 +15,7 @@
     "src"
   ],
   "scripts": {
-    "browserify": "browserify site/index.js -i graceful-fs -i glob -o docs/dist/bundle.js",
+    "browserify": "browserify site/index.js -i graceful-fs -i glob -i walkdir -i tar-stream -o docs/dist/bundle.js",
     "circleci": "run-s test",
     "cp": "cpr node_modules/normalize.css/normalize.css docs/dist/ -o",
     "eslint": "eslint bin src site test",

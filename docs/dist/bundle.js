@@ -1346,7 +1346,7 @@ module.exports = Archiver;
  */
 
 }).call(this,require('_process'),require("buffer").Buffer)
-},{"_process":189,"archiver-utils":2,"async":29,"buffer":66,"fs":62,"glob":62,"lodash":146,"path":185,"readable-stream":205,"util":230,"walkdir":232}],5:[function(require,module,exports){
+},{"_process":189,"archiver-utils":2,"async":29,"buffer":66,"fs":62,"glob":62,"lodash":146,"path":185,"readable-stream":205,"util":230,"walkdir":62}],5:[function(require,module,exports){
 /**
  * JSON Format Plugin
  *
@@ -1739,7 +1739,7 @@ module.exports = Zip;
  * @external ZipStream
  * @see {@link https://archiverjs.com/zip-stream/ZipStream.html}
  */
-},{"archiver-utils":2,"zip-stream":235}],8:[function(require,module,exports){
+},{"archiver-utils":2,"zip-stream":234}],8:[function(require,module,exports){
 var asn1 = exports;
 
 asn1.bignum = require('bn.js');
@@ -49700,7 +49700,7 @@ function onceStrict (fn) {
   return f
 }
 
-},{"wrappy":233}],169:[function(require,module,exports){
+},{"wrappy":232}],169:[function(require,module,exports){
 'use strict';
 
 
@@ -60162,7 +60162,7 @@ Extract.prototype._write = function (data, enc, cb) {
 
 module.exports = Extract
 
-},{"./headers":224,"bl":31,"readable-stream":205,"util":230,"xtend":234}],224:[function(require,module,exports){
+},{"./headers":224,"bl":31,"readable-stream":205,"util":230,"xtend":233}],224:[function(require,module,exports){
 (function (Buffer){
 var ZEROS = '0000000000000000000'
 var ZERO_OFFSET = '0'.charCodeAt(0)
@@ -61520,264 +61520,6 @@ exports.createContext = Script.createContext = function (context) {
 };
 
 },{"indexof":141}],232:[function(require,module,exports){
-(function (process){
-var EventEmitter = require('events').EventEmitter,
-_fs = require('fs'),
-_path = require('path'),
-sep = _path.sep||'/';// 0.6.x
-
-
-module.exports = walkdir;
-
-walkdir.find = walkdir.walk = walkdir;
-
-walkdir.sync = function(path,options,cb){
-  if(typeof options == 'function') cb = options;
-  options = options || {};
-  options.sync = true;
-  return walkdir(path,options,cb);
-
-};
-
-function walkdir(path,options,cb){
-
-  if(typeof options == 'function') cb = options;
-
-  options = options || {};
-  
-  var fs = options.fs || _fs;
-
-  var emitter = new EventEmitter(),
-  dontTraverse = [],
-  allPaths = (options.return_object?{}:[]),
-  resolved = false,
-  inos = {},
-  stop = 0,
-  pause = null,
-  ended = 0, 
-  jobs=0, 
-  job = function(value) {
-    jobs += value;
-    if(value < 1 && !tick) {
-      tick = 1;
-      process.nextTick(function(){
-        tick = 0;
-        if(jobs <= 0 && !ended) {
-          ended = 1;
-          emitter.emit('end');
-        }
-      });
-    }
-  }, tick = 0;
-
-  emitter.ignore = function(path){
-    if(Array.isArray(path)) dontTraverse.push.apply(dontTraverse,path)
-    else dontTraverse.push(path)
-    return this
-  }
-
-  //mapping is stat functions to event names.	
-  var statIs = [['isFile','file'],['isDirectory','directory'],['isSymbolicLink','link'],['isSocket','socket'],['isFIFO','fifo'],['isBlockDevice','blockdevice'],['isCharacterDevice','characterdevice']];
-
-  var statter = function (path,first,depth) {
-    job(1);
-    var statAction = function fn(err,stat,data) {
-
-      job(-1);
-      if(stop) return;
-
-      // in sync mode i found that node will sometimes return a null stat and no error =(
-      // this is reproduceable in file descriptors that no longer exist from this process
-      // after a readdir on /proc/3321/task/3321/ for example. Where 3321 is this pid
-      // node @ v0.6.10 
-      if(err || !stat) { 
-        emitter.emit('fail',path,err);
-        return;
-      }
-
-
-      //if i have evented this inode already dont again.
-      var fileName = _path.basename(path);
-      var fileKey = stat.dev + '-' + stat.ino + '-' + fileName;
-      if(inos[fileKey] && stat.ino) return;
-      inos[fileKey] = 1;
-
-      if (first && stat.isDirectory()) {
-        emitter.emit('targetdirectory',path,stat,depth);
-        return;
-      }
-
-      emitter.emit('path', path, stat,depth);
-
-      var i,name;
-
-      for(var j=0,k=statIs.length;j<k;j++) {
-        if(stat[statIs[j][0]]()) {
-          emitter.emit(statIs[j][1],path,stat,depth);
-          break;
-        }
-      }
-    };
-    
-    if(options.sync) {
-      var stat,ex;
-      try{
-        stat = fs.lstatSync(path);
-      } catch (e) {
-        ex = e;
-      }
-
-      statAction(ex,stat);
-    } else {
-        fs.lstat(path,statAction);
-    }
-  },readdir = function(path,stat,depth){
-    if(!resolved) {
-      path = _path.resolve(path);
-      resolved = 1;
-    }
-
-    if(options.max_depth && depth >= options.max_depth){
-      emitter.emit('maxdepth',path,stat,depth);
-      return;
-    }
-
-    if(dontTraverse.length){
-      for(var i=0;i<dontTraverse.length;++i){
-        if(dontTraverse[i] == path) {
-          dontTraverse.splice(i,1)
-          return;
-        }
-      }
-    }
-
-    job(1);
-    var readdirAction = function(err,files) {
-      job(-1);
-      if (err || !files) {
-        //permissions error or invalid files
-        emitter.emit('fail',path,err);
-        return;
-      }
-
-      if(!files.length) {
-        // empty directory event.
-        emitter.emit('empty',path,stat,depth);
-        return;     
-      }
-
-      if(path == sep) path='';
-      for(var i=0,j=files.length;i<j;i++){
-        statter(path+sep+files[i],false,(depth||0)+1);
-      }
-
-    };
-
-
-    //use same pattern for sync as async api
-    if(options.sync) {
-      var e,files;
-      try {
-          files = fs.readdirSync(path);
-      } catch (e) { }
-
-      readdirAction(e,files);
-    } else {
-      fs.readdir(path,readdirAction);
-    }
-  };
-
-  if (options.follow_symlinks) {
-    var linkAction = function(err,path,depth){
-      job(-1);
-      //TODO should fail event here on error?
-      statter(path,false,depth);
-    };
-
-    emitter.on('link',function(path,stat,depth){
-      job(1);
-      if(options.sync) {
-        var lpath,ex;
-        try {
-          lpath = fs.readlinkSync(path);
-        } catch(e) {
-          ex = e;
-        }
-        linkAction(ex,_path.resolve(_path.dirname(path),lpath),depth);
-
-      } else {
-        fs.readlink(path,function(err,lpath){
-          linkAction(err,_path.resolve(_path.dirname(path),lpath),depth);
-        });
-      }
-    });
-  }
-
-  if (cb) {
-    emitter.on('path',cb);
-  }
-
-  if (options.sync) {
-    if(!options.no_return){
-      emitter.on('path',function(path,stat){
-        if(options.return_object) allPaths[path] = stat;
-        else allPaths.push(path);
-      });
-    }
-  }
-
-  if (!options.no_recurse) {
-    emitter.on('directory',readdir);
-  }
-  //directory that was specified by argument.
-  emitter.once('targetdirectory',readdir);
-  //only a fail on the path specified by argument is fatal 
-  emitter.once('fail',function(_path,err){
-    //if the first dir fails its a real error
-    if(path == _path) {
-      emitter.emit('error',path,err);
-    }
-  });
-
-  statter(path,1);
-  if (options.sync) {
-    return allPaths;
-  } else {
-    //support stopping everything.
-    emitter.end = emitter.stop = function(){stop = 1;};
-    //support pausing everything
-    var emitQ = [];
-    emitter.pause = function(){
-      job(1);
-      pause = true;
-      emitter.emit = function(){
-        emitQ.push(arguments);
-      };
-    };
-    // support getting the show going again
-    emitter.resume = function(){
-      if(!pause) return;
-      pause = false;
-      // not pending
-      job(-1);
-      //replace emit
-      emitter.emit = EventEmitter.prototype.emit;
-      // local ref
-      var q = emitQ;
-      // clear ref to prevent infinite loops
-      emitQ = [];
-      while(q.length) {
-        emitter.emit.apply(emitter,q.shift());
-      }
-    };
-
-    return emitter;
-  }
-
-}
-
-}).call(this,require('_process'))
-},{"_process":189,"events":131,"fs":62,"path":185}],233:[function(require,module,exports){
 // Returns a wrapper function that returns a wrapped callback
 // The wrapper function should do some stuff, and return a
 // presumably different callback function.
@@ -61812,7 +61554,7 @@ function wrappy (fn, cb) {
   }
 }
 
-},{}],234:[function(require,module,exports){
+},{}],233:[function(require,module,exports){
 module.exports = extend
 
 var hasOwnProperty = Object.prototype.hasOwnProperty;
@@ -61833,7 +61575,7 @@ function extend() {
     return target
 }
 
-},{}],235:[function(require,module,exports){
+},{}],234:[function(require,module,exports){
 /**
  * ZipStream
  *
@@ -61995,7 +61737,7 @@ ZipStream.prototype.finalize = function() {
  * @external ZipArchiveOutputStream
  * @see {@link https://github.com/archiverjs/node-compress-commons}
  */
-},{"archiver-utils":2,"compress-commons":76,"util":230}],236:[function(require,module,exports){
+},{"archiver-utils":2,"compress-commons":76,"util":230}],235:[function(require,module,exports){
 'use strict';
 
 const Buffer = require('buffer').Buffer;
@@ -62044,7 +61786,7 @@ function outputResult(output) {
   $('#output .ppk').href = URL.createObjectURL(new Blob([output.privateKey], {type: 'text/plain'}));
 }
 
-},{"../src/":238,"buffer":66}],237:[function(require,module,exports){
+},{"../src/":237,"buffer":66}],236:[function(require,module,exports){
 'use strict';
 
 const N_TO_A = 'a'.charCodeAt(0) - '0'.charCodeAt(0);
@@ -62070,7 +61812,7 @@ function hex2a(hex) {
 
 module.exports = hex2a;
 
-},{}],238:[function(require,module,exports){
+},{}],237:[function(require,module,exports){
 'use strict';
 
 const archiver = require('archiver');
@@ -62135,7 +61877,7 @@ function zip(contentsZip, publicKey, signature) {
 
 module.exports = packer;
 
-},{"./sign":239,"./uuid":240,"archiver":3,"debug":102,"node-rsa":151,"stream-buffers":220}],239:[function(require,module,exports){
+},{"./sign":238,"./uuid":239,"archiver":3,"debug":102,"node-rsa":151,"stream-buffers":220}],238:[function(require,module,exports){
 'use strict';
 
 const RSA = require('node-rsa');
@@ -62152,7 +61894,7 @@ function sign(contents, privateKey) {
 
 module.exports = sign;
 
-},{"node-rsa":151}],240:[function(require,module,exports){
+},{"node-rsa":151}],239:[function(require,module,exports){
 'use strict';
 
 const crypto = require('crypto');
@@ -62172,4 +61914,4 @@ function uuid(publicKey) {
 
 module.exports = uuid;
 
-},{"./hex2a":237,"crypto":101}]},{},[236]);
+},{"./hex2a":236,"crypto":101}]},{},[235]);
