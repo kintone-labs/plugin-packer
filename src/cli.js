@@ -52,7 +52,7 @@ function cli(pluginDir, options) {
   const outputDir = path.dirname(path.resolve(pluginDir));
   debug(`outDir : ${outputDir}`);
 
-  // 5. generate new ppk if not specified
+  // 4. generate new ppk if not specified
   const ppkFile = options.ppk;
   let privateKey;
   if (ppkFile) {
@@ -60,7 +60,7 @@ function cli(pluginDir, options) {
     privateKey = fs.readFileSync(ppkFile, 'utf8');
   }
 
-  // 6. package plugin.zip
+  // 5. package plugin.zip
   return createContentsZip(pluginDir, manifest)
     .then(contentsZip => packerLocal(contentsZip, privateKey))
     .then(output => {
