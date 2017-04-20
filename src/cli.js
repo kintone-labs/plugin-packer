@@ -5,8 +5,6 @@ const fs = require('fs');
 const ZipFile = require('yazl').ZipFile;
 const denodeify = require('denodeify');
 const writeFile = denodeify(fs.writeFile);
-const nodeDir = require('node-dir');
-const listFiles = denodeify(nodeDir.files);
 const streamBuffers = require('stream-buffers');
 const debug = require('debug')('cli');
 const validate = require('@teppeis/kintone-plugin-manifest-validator');
@@ -34,6 +32,7 @@ function cli(pluginDir, options) {
     throw new Error('Manifest file $PLUGIN_DIR/manifest.json not found.');
   }
 
+  // 3. validate manifest.json
   const manifest = loadJson(manifestJsonPath);
   const result = validate(manifest, {
     relativePath: validateRelativePath(pluginDir),
@@ -53,37 +52,23 @@ function cli(pluginDir, options) {
   const outputDir = path.dirname(path.resolve(pluginDir));
   debug(`outDir : ${outputDir}`);
 
-  return listFiles(pluginDir).then(files => {
-    files.forEach(file => {
-      const basename = path.basename(file);
-      // 3. check dot files
-      if (/^\./.test(basename)) {
-        throw new Error(`PLUGIN_DIR must not contain dot files or directories : ${file}`);
-      }
-      // 4. check *.ppk
-      if (/\.ppk$/.test(basename)) {
-        throw new Error(`PLUGIN_DIR must not contain * .ppk : ${file}`);
-      }
-    });
-  }).then(() => {
-    // 5. generate new ppk if not specified
-    const ppkFile = options.ppk;
-    let privateKey;
-    if (ppkFile) {
-      debug(`loading an existing key: ${ppkFile}`);
-      privateKey = fs.readFileSync(ppkFile, 'utf8');
-    }
+  // 5. generate new ppk if not specified
+  const ppkFile = options.ppk;
+  let privateKey;
+  if (ppkFile) {
+    debug(`loading an existing key: ${ppkFile}`);
+    privateKey = fs.readFileSync(ppkFile, 'utf8');
+  }
 
-    // 6. package plugin.zip
-    return createContentsZip(pluginDir, manifest)
-      .then(contentsZip => packerLocal(contentsZip, privateKey))
-      .then(output => {
-        if (!ppkFile) {
-          fs.writeFileSync(path.join(outputDir, `${output.id}.ppk`), output.privateKey, 'utf8');
-        }
-        return outputPlugin(outputDir, output.plugin);
-      });
-  });
+  // 6. package plugin.zip
+  return createContentsZip(pluginDir, manifest)
+    .then(contentsZip => packerLocal(contentsZip, privateKey))
+    .then(output => {
+      if (!ppkFile) {
+        fs.writeFileSync(path.join(outputDir, `${output.id}.ppk`), output.privateKey, 'utf8');
+      }
+      return outputPlugin(outputDir, output.plugin);
+    });
 }
 
 module.exports = cli;
@@ -115,7 +100,7 @@ function createContentsZip(pluginDir, manifest) {
 }
 
 /**
- * Create content file list
+ * Create content file list from manifest.json
  *
  * @param {!Object} manifest
  * @return {!Array<string>}
@@ -128,24 +113,16 @@ function createSourceList(manifest) {
     ['config', 'js'],
     ['config', 'css']
   ];
-  const list = ['manifest.json', manifest.icon];
+  const list = sourceTypes
+    .map(t => manifest[t[0]] && manifest[t[0]][t[1]])
+    .filter(i => !!i)
+    .reduce((a, b) => a.concat(b), [])
+    .filter(file => !/^https?:\/\//.test(file));
   if (manifest.config && manifest.config.html) {
     list.push(manifest.config.html);
   }
-  sourceTypes.forEach(t => {
-    const category = t[0];
-    const type = t[1];
-    if (manifest[category]) {
-      Array.prototype.push.apply(list, manifest[category][type]);
-    }
-  });
-  const sourceList = [];
-  list.forEach(src => {
-    if (!/^https?:\/\//.test(src)) {
-      sourceList.push(src);
-    }
-  });
-  return sourceList;
+  list.push('manifest.json', manifest.icon);
+  return list;
 }
 
 /**
