@@ -14,7 +14,7 @@ const generateErrorMessages = require('./gen-error-msg');
 
 /**
  * @param {string} pluginDir path to plugin directory.
- * @param {Object=} options {ppk: string}.
+ * @param {Object=} options {ppk: string, out: string}.
  * @return {!Promise<string>} The resolved value is a path to the output plugin zip file.
  */
 function cli(pluginDir, options) {
@@ -34,23 +34,16 @@ function cli(pluginDir, options) {
 
   // 3. validate manifest.json
   const manifest = loadJson(manifestJsonPath);
-  const result = validate(manifest, {
-    relativePath: validateRelativePath(pluginDir),
-    maxFileSize: validateMaxFileSize(pluginDir),
-  });
-  debug(result);
+  throwIfInvalidManifest(manifest, pluginDir);
 
-  if (!result.valid) {
-    const msgs = generateErrorMessages(result.errors);
-    console.error('Invalid manifest.json:');
-    msgs.forEach(msg => {
-      console.error(`- ${msg}`);
-    });
-    throw new Error('Invalid manifest.json');
+  let outputDir = path.dirname(path.resolve(pluginDir));
+  let outputFile = path.join(outputDir, 'plugin.zip');
+  if (options.out) {
+    outputFile = options.out;
+    outputDir = path.dirname(path.resolve(outputFile));
   }
-
-  const outputDir = path.dirname(path.resolve(pluginDir));
-  debug(`outDir : ${outputDir}`);
+  debug(`outputDir : ${outputDir}`);
+  debug(`outputFile : ${outputFile}`);
 
   // 4. generate new ppk if not specified
   const ppkFile = options.ppk;
@@ -67,11 +60,32 @@ function cli(pluginDir, options) {
       if (!ppkFile) {
         fs.writeFileSync(path.join(outputDir, `${output.id}.ppk`), output.privateKey, 'utf8');
       }
-      return outputPlugin(outputDir, output.plugin);
+      return outputPlugin(outputFile, output.plugin);
     });
 }
 
 module.exports = cli;
+
+/**
+ * @param {!Object} manifest
+ * @param {string} pluginDir
+ */
+function throwIfInvalidManifest(manifest, pluginDir) {
+  const result = validate(manifest, {
+    relativePath: validateRelativePath(pluginDir),
+    maxFileSize: validateMaxFileSize(pluginDir),
+  });
+  debug(result);
+
+  if (!result.valid) {
+    const msgs = generateErrorMessages(result.errors);
+    console.error('Invalid manifest.json:');
+    msgs.forEach(msg => {
+      console.error(`- ${msg}`);
+    });
+    throw new Error('Invalid manifest.json');
+  }
+}
 
 /**
  * Create contents.zip
@@ -128,12 +142,11 @@ function createSourceList(manifest) {
 /**
  * Create and save plugin.zip
  *
- * @param {string} outputDir
+ * @param {string} outputPath
  * @param {!Buffer} plugin
  * @return {!Promise<string>} The value is output path of plugin.zip.
  */
-function outputPlugin(outputDir, plugin) {
-  const outputPath = path.join(outputDir, 'plugin.zip');
+function outputPlugin(outputPath, plugin) {
   return writeFile(outputPath, plugin)
     .then(arg => outputPath);
 }
