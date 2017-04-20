@@ -6,7 +6,6 @@ const ZipFile = require('yazl').ZipFile;
 const denodeify = require('denodeify');
 const writeFile = denodeify(fs.writeFile);
 const nodeDir = require('node-dir');
-const listPaths = denodeify(nodeDir.paths);
 const listFiles = denodeify(nodeDir.files);
 const streamBuffers = require('stream-buffers');
 const debug = require('debug')('cli');
@@ -35,7 +34,8 @@ function cli(pluginDir, options) {
     throw new Error('Manifest file $PLUGIN_DIR/manifest.json not found.');
   }
 
-  const result = validate(loadJson(manifestJsonPath), {
+  const manifest = loadJson(manifestJsonPath);
+  const result = validate(manifest, {
     relativePath: validateRelativePath(pluginDir),
     maxFileSize: validateMaxFileSize(pluginDir),
   });
@@ -75,7 +75,7 @@ function cli(pluginDir, options) {
     }
 
     // 6. package plugin.zip
-    return createContentsZip(pluginDir)
+    return createContentsZip(pluginDir, manifest)
       .then(contentsZip => packerLocal(contentsZip, privateKey))
       .then(output => {
         if (!ppkFile) {
@@ -92,10 +92,11 @@ module.exports = cli;
  * Create contents.zip
  *
  * @param {string} pluginDir
+ * @param {!Object} manifest
  * @return {!Promise<!Buffer>}
  */
-function createContentsZip(pluginDir) {
-  return listPaths(pluginDir).then(result => new Promise((res, rej) => {
+function createContentsZip(pluginDir, manifest) {
+  return new Promise((res, rej) => {
     const output = new streamBuffers.WritableStreamBuffer();
     const zipFile = new ZipFile();
     let size = null;
@@ -104,16 +105,47 @@ function createContentsZip(pluginDir) {
       res(output.getContents());
     });
     zipFile.outputStream.pipe(output);
-    result.files.forEach(file => {
-      zipFile.addFile(file, path.relative(pluginDir, file));
-    });
-    result.dirs.forEach(dir => {
-      zipFile.addEmptyDirectory(path.relative(pluginDir, dir));
+    createSourceList(manifest).forEach(src => {
+      zipFile.addFile(path.join(pluginDir, src), src);
     });
     zipFile.end(finalSize => {
       size = finalSize;
     });
-  }));
+  });
+}
+
+/**
+ * Create content file list
+ *
+ * @param {!Object} manifest
+ * @return {!Array<string>}
+ */
+function createSourceList(manifest) {
+  const sourceTypes = [
+    ['desktop', 'js'],
+    ['desktop', 'css'],
+    ['mobile', 'js'],
+    ['config', 'js'],
+    ['config', 'css']
+  ];
+  const list = ['manifest.json', manifest.icon];
+  if (manifest.config && manifest.config.html) {
+    list.push(manifest.config.html);
+  }
+  sourceTypes.forEach(t => {
+    const category = t[0];
+    const type = t[1];
+    if (manifest[category]) {
+      Array.prototype.push.apply(list, manifest[category][type]);
+    }
+  });
+  const sourceList = [];
+  list.forEach(src => {
+    if (!/^https?:\/\//.test(src)) {
+      sourceList.push(src);
+    }
+  });
+  return sourceList;
 }
 
 /**
