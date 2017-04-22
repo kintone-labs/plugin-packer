@@ -5,6 +5,7 @@ const fs = require('fs');
 const ZipFile = require('yazl').ZipFile;
 const denodeify = require('denodeify');
 const writeFile = denodeify(fs.writeFile);
+const mkdirp = denodeify(require('mkdirp'));
 const streamBuffers = require('stream-buffers');
 const debug = require('debug')('cli');
 const validate = require('@teppeis/kintone-plugin-manifest-validator');
@@ -54,14 +55,17 @@ function cli(pluginDir, options) {
   }
 
   // 5. package plugin.zip
-  return createContentsZip(pluginDir, manifest)
-    .then(contentsZip => packerLocal(contentsZip, privateKey))
-    .then(output => {
-      if (!ppkFile) {
-        fs.writeFileSync(path.join(outputDir, `${output.id}.ppk`), output.privateKey, 'utf8');
-      }
-      return outputPlugin(outputFile, output.plugin);
-    });
+  return Promise.all([
+    mkdirp(outputDir),
+    createContentsZip(pluginDir, manifest)
+      .then(contentsZip => packerLocal(contentsZip, privateKey)),
+  ]).then(result => {
+    const output = result[1];
+    if (!ppkFile) {
+      fs.writeFileSync(path.join(outputDir, `${output.id}.ppk`), output.privateKey, 'utf8');
+    }
+    return outputPlugin(outputFile, output.plugin);
+  });
 }
 
 module.exports = cli;

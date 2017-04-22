@@ -154,4 +154,23 @@ describe('cli', () => {
         ].sort());
       });
   });
+
+  it('includes files listed in manifest.json only', () => {
+    const pluginDir = path.join(outDir, 'plugin-dir');
+    let packer = sinon.stub().returns({
+      id: ID,
+      privateKey: PRIVATE_KEY,
+      plugin: PLUGIN_BUFFER,
+    });
+
+    return rimraf('test/.output')
+      .then(() => cli(pluginDir, {packerMock_: packer, out: 'test/.output/foo.zip'}))
+      .then(pluginFilePath => {
+        assert.equal(pluginFilePath, 'test/.output/foo.zip');
+        const pluginFile = fs.readFileSync(pluginFilePath);
+        assert(PLUGIN_BUFFER.equals(pluginFile));
+        const ppk = fs.readFileSync(`test/.output/${ID}.ppk`);
+        assert.equal(PRIVATE_KEY, ppk);
+      });
+  });
 });
