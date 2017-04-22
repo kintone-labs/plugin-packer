@@ -30,47 +30,47 @@ function rezip(contentsZip) {
         rej(error);
       });
     }))
-  .then(zipFile => {
-    const manifestList = files.filter(file => /(^|\/)manifest.json$/.test(file));
-    if (manifestList.length === 0) {
-      throw new Error('The zip file has no manifest.json');
-    } else if (manifestList.length > 1) {
-      throw new Error('The zip file has many manifest.json files');
-    }
-    return new Promise((res, rej) => {
-      zipFile.openReadStream(entries[manifestList[0]], (e, stream) => {
-        if (e) {
-          rej(e);
-          return;
-        }
-        const output = new streamBuffers.WritableStreamBuffer();
-        output.on('finish', () => {
-          res(output.getContents().toString('utf8'));
-        });
-        stream.pipe(output);
-      });
-    });
-  })
-  .then(manifestJson => validate(JSON.parse(manifestJson), {
-    relativePath: filePath => entries.hasOwnProperty(filePath),
-    maxFileSize(maxBytes, filePath) {
-      const entry = entries[filePath];
-      if (entry) {
-        return entry.uncompressedSize <= maxBytes;
+    .then(zipFile => {
+      const manifestList = files.filter(file => /(^|\/)manifest.json$/.test(file));
+      if (manifestList.length === 0) {
+        throw new Error('The zip file has no manifest.json');
+      } else if (manifestList.length > 1) {
+        throw new Error('The zip file has many manifest.json files');
       }
-      return false;
-    }
-  }))
-  .then(result => {
-    if (result.valid) {
-      return contentsZip;
-    } else {
-      const errors = genErrorMsg(result.errors);
-      const e = new Error(errors.join(', '));
-      e.validationErrors = errors;
-      throw e;
-    }
-  });
+      return new Promise((res, rej) => {
+        zipFile.openReadStream(entries[manifestList[0]], (e, stream) => {
+          if (e) {
+            rej(e);
+            return;
+          }
+          const output = new streamBuffers.WritableStreamBuffer();
+          output.on('finish', () => {
+            res(output.getContents().toString('utf8'));
+          });
+          stream.pipe(output);
+        });
+      });
+    })
+    .then(manifestJson => validate(JSON.parse(manifestJson), {
+      relativePath: filePath => entries.hasOwnProperty(filePath),
+      maxFileSize(maxBytes, filePath) {
+        const entry = entries[filePath];
+        if (entry) {
+          return entry.uncompressedSize <= maxBytes;
+        }
+        return false;
+      }
+    }))
+    .then(result => {
+      if (result.valid) {
+        return contentsZip;
+      } else {
+        const errors = genErrorMsg(result.errors);
+        const e = new Error(errors.join(', '));
+        e.validationErrors = errors;
+        throw e;
+      }
+    });
 }
 
 module.exports = rezip;
