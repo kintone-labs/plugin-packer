@@ -18,13 +18,13 @@
     "circleci": "run-s test",
     "css": "cssnano node_modules/normalize.css/normalize.css --safe > docs/dist/normalize.min.css",
     "eslint": "eslint bin src site test",
-    "js": "run-s js:tsc js:browserify js:minify",
-    "js:tsc": "tsc",
+    "js": "run-s js:browserify js:minify",
     "js:browserify": "browserify site/index.js -i graceful-fs -i glob -i walkdir -i tar-stream -i isomorphic-url -o docs/dist/bundle.js",
     "js:minify": "closure-compiler --js docs/dist/bundle.js --language_out ES6 -O WHITESPACE_ONLY > docs/dist/bundle.min.js",
     "mocha": "mocha --require intelli-espower-loader",
     "site": "run-p js css",
-    "test": "run-s eslint mocha"
+    "test": "run-s eslint tsc mocha",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@teppeis/kintone-plugin-manifest-validator": "^0.5.1",

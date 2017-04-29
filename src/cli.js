@@ -50,7 +50,8 @@ function cli(pluginDir, options) {
 
   // 4. generate new ppk if not specified
   const ppkFile = options.ppk;
-  let privateKey = '';
+  /** @type {string?} */
+  let privateKey;
   if (ppkFile) {
     debug(`loading an existing key: ${ppkFile}`);
     privateKey = fs.readFileSync(ppkFile, 'utf8');
