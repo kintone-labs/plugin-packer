@@ -197,6 +197,10 @@ base64-js@^1.0.2:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/base64-js/-/base64-js-1.2.0.tgz#a39992d723584811982be5e290bb6a53d86700f1"
 
+bind.ts@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/bind.ts/-/bind.ts-1.0.0.tgz#346f0480850a92d835dd0f10ed7660ee9dfe97d4"
+
 bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.1.1, bn.js@^4.4.0:
   version "4.11.6"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.11.6.tgz#53344adb14617a13f6e8dd2ce28905d1c0ba3215"

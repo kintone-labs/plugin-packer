@@ -1,10 +1,13 @@
 /// <reference types="node" />
 declare module 'yazl' {
     import {Readable} from 'stream';
-    export class ZipFile {
-        addFile(realPath: string, metadataPath: string, options?: any): void;
-        addBuffer(buffer: Buffer, metadataPath: string, options?: any): void;
+    import {EventEmitter} from 'events';
+
+    export class ZipFile extends EventEmitter {
+        addFile(realPath: string, metadataPath: string, options?: Object): void;
+        addBuffer(buffer: Buffer, metadataPath: string, options?: Object): void;
+        addReadStream(readStream: Readable, metadataPath: string, options?: Object): void;
         outputStream: Readable;
-        end(finalSizeCallback: (size: number) => void): void;
+        end(finalSizeCallback?: (size: number) => void): void;
     }
 }

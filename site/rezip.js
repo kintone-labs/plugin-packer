@@ -6,9 +6,16 @@ const yauzl = require('yauzl');
 const denodeify = require('denodeify');
 const validate = require('@teppeis/kintone-plugin-manifest-validator');
 const streamBuffers = require('stream-buffers');
+const bind = require('bind.ts').default;
 
 const genErrorMsg = require('../src/gen-error-msg');
 const sourceList = require('../src/sourcelist');
+
+// only for typings in JSDoc
+// eslint-disable-next-line no-unused-vars
+class ZipFile extends yauzl.ZipFile {}
+// eslint-disable-next-line no-unused-vars
+class Entry extends yauzl.Entry {}
 
 /**
  * Extract, validate and rezip contents.zip
@@ -39,8 +46,15 @@ function rezip(contentsZip) {
 }
 
 /**
+ * @typedef {Object} RezipResult
+ * @property {!ZipFile} zipFile
+ * @property {!Map<string, !Entry>} entries
+ * @property {string} manifestPath
+ */
+
+/**
  * @param {!Buffer} contentsZip
- * @return {!Promise<{zipFile: !yauzl.ZipFile, entries: !Map<string, !yauzl.ZipEntry>}>}
+ * @return {!Promise<!RezipResult>}
  */
 function zipEntriesFromBuffer(contentsZip) {
   return denodeify(yauzl.fromBuffer)(contentsZip)
@@ -61,8 +75,8 @@ function zipEntriesFromBuffer(contentsZip) {
 }
 
 /**
- * @param {!yauzl.ZipFile} zipFile
- * @param {!yauzl.ZipEntry} zipEntry
+ * @param {!ZipFile} zipFile
+ * @param {!Entry} zipEntry
  * @return {!Promise<string>}
  */
 function zipEntryToString(zipFile, zipEntry) {
@@ -79,8 +93,8 @@ function zipEntryToString(zipFile, zipEntry) {
 }
 
 /**
- * @param {!yauzl.ZipFile} zipFile
- * @param {!yauzl.ZipEntry} zipEntry
+ * @param {!ZipFile} zipFile
+ * @param {!Entry} zipEntry
  * @return {!Promise<string>}
  */
 function getManifestJsonFromEntry(zipFile, zipEntry) {
@@ -88,7 +102,7 @@ function getManifestJsonFromEntry(zipFile, zipEntry) {
 }
 
 /**
- * @param {!Map<string, !yauzl.ZipEntry>} entries
+ * @param {!Map<string, !Entry>} entries
  * @param {!Object} manifestJson
  * @param {string} prefix
  * @throws if manifest.json is invalid
@@ -114,8 +128,8 @@ function validateManifest(entries, manifestJson, prefix) {
 }
 
 /**
- * @param {!yauzl.ZipFile} zipFile
- * @param {!Map<string, !yauzl.ZipEntry>} entries
+ * @param {!ZipFile} zipFile
+ * @param {!Map<string, !Entry>} entries
  * @param {!Object} manifestJson
  * @param {string} prefix
  * @return {!Promise<!Buffer>}
@@ -129,7 +143,7 @@ function rezipContents(zipFile, entries, manifestJson, prefix) {
       res(output.getContents());
     });
     newZipFile.outputStream.pipe(output);
-    const openReadStream = denodeify(zipFile.openReadStream.bind(zipFile));
+    const openReadStream = denodeify(bind(zipFile.openReadStream, zipFile));
     Promise.all(sourceList(manifestJson).map(src => {
       const entry = entries.get(path.join(prefix, src));
       return openReadStream(entry).then(stream => {
