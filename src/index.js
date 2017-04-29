@@ -12,7 +12,7 @@ const uuid = require('./uuid');
  * @typedef {Object} PackerResult
  * @property {!Buffer} plugin
  * @property {string} privateKey
- * @property {string} string
+ * @property {string} id
  */
 
 /**
