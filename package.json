@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@teppeis/kintone-plugin-manifest-validator": "^0.5.1",
-    "bind.ts": "^1.0.0",
+    "bind.ts": "^1.1.4",
     "debug": "^2.6.3",
     "denodeify": "^1.2.1",
     "meow": "^3.7.0",
