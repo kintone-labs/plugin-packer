@@ -121,6 +121,7 @@ function validateManifest(entries, manifestJson, prefix) {
 
   if (!result.valid) {
     const errors = genErrorMsg(result.errors);
+    /** @type {JSONSchemaError} */
     const e = new Error(errors.join(', '));
     e.validationErrors = errors;
     throw e;
