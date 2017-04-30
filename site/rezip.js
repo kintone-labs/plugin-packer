@@ -35,6 +35,7 @@ function rezip(contentsZip) {
       }
       result.manifestPath = manifestList[0];
       const manifestEntry = result.entries.get(result.manifestPath);
+      if (!manifestEntry) throw new Error(`Entry is not found for ${result.manifestPath}`);
       return getManifestJsonFromEntry(result.zipFile, manifestEntry)
         .then(json => Object.assign(result, {manifestJson: json}));
     })
@@ -147,6 +148,7 @@ function rezipContents(zipFile, entries, manifestJson, prefix) {
     const openReadStream = denodeify(bind(zipFile.openReadStream, zipFile));
     Promise.all(sourceList(manifestJson).map(src => {
       const entry = entries.get(path.join(prefix, src));
+      if (!entry) throw new Error(`Entry is not found for ${src}`);
       return openReadStream(entry).then(stream => {
         newZipFile.addReadStream(stream, src, {size: entry.uncompressedSize});
       });
