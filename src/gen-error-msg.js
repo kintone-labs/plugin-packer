@@ -1,7 +1,7 @@
 'use strict';
 
 /**
- * @param {!Array<{keyword: string, dataPath: string, message: string, params: any}>} errors
+ * @param {!Array<{keyword: string, dataPath: string, message: string, params: {allowedValues: string[]}}>} errors
  * @return {!Array<string>}
  */
 function generateErrorMessages(errors) {
