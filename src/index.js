@@ -50,6 +50,7 @@ function zip(contentsZip, publicKey, signature) {
   return new Promise((res, rej) => {
     const output = new streamBuffers.WritableStreamBuffer();
     const zipFile = new ZipFile();
+    /** @type {?number} */
     let size = null;
     output.on('finish', () => {
       debug(`plugin.zip: ${size} bytes`);
