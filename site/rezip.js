@@ -60,6 +60,7 @@ function rezip(contentsZip) {
 function zipEntriesFromBuffer(contentsZip) {
   return denodeify(yauzl.fromBuffer)(contentsZip)
     .then(zipFile => new Promise((res, rej) => {
+      /** @type {!Map<string, !Entry>} */
       const entries = new Map();
       const result = {
         zipFile: zipFile,
@@ -110,7 +111,16 @@ function getManifestJsonFromEntry(zipFile, zipEntry) {
  */
 function validateManifest(entries, manifestJson, prefix) {
   const result = validate(manifestJson, {
+    /**
+     * @param {string} filePath
+     * @return {boolean}
+     */
     relativePath: filePath => entries.has(path.join(prefix, filePath)),
+    /**
+     * @param {number} maxBytes
+     * @param {string} filePath
+     * @return {boolean}
+     */
     maxFileSize(maxBytes, filePath) {
       const entry = entries.get(path.join(prefix, filePath));
       if (entry) {
