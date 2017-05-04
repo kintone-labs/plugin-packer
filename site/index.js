@@ -5,13 +5,59 @@ const Buffer = require('buffer').Buffer;
 const rezip = require('./rezip');
 const packer = require('../src/');
 
-// eslint-disable-next-line id-match
-const $ = document.querySelector.bind(document);
+/**
+ * @param {string} selector
+ * @param {function(new: T, ...*)} type
+ * @return {!T}
+ * @template T
+ */
+function $(selector, type) {
+  type = type || Element;
+  const el = document.querySelector(selector);
+  if (!el) throw new Error(`element not found: ${selector}`);
+  return assertInstanceof(el, type);
+}
+
+/**
+ * @param {string} selector
+ * @return {!Element}
+ */
+function $e(selector) {
+  return $(selector, Element);
+}
+
+/** @type {ArrayBuffer} */
 let contents;
+/** @type {string} */
 let privateKey;
 
-$('#input .contents').addEventListener('change', event => {
-  const file = event.target.files[0];
+/**
+ * @param {*} value
+ * @param {function(new: T, ...*)} type
+ * @return {!T}
+ * @template T
+ */
+function assertInstanceof(value, type) {
+  if (value instanceof type) {
+    return value;
+  }
+  throw new Error('the value is not instance of the type');
+}
+
+/**
+ * @param {T|null|undefined} value
+ * @return {!T}
+ * @template T
+ */
+function assertNotNull(value) {
+  if (value != null) {
+    return value;
+  }
+  throw new Error('the value is not instance of the type');
+}
+
+$('#input .contents', HTMLInputElement).addEventListener('change', function(event) {
+  const file = assertNotNull(this.files)[0];
   if (!file) {
     return;
   }
@@ -23,8 +69,8 @@ $('#input .contents').addEventListener('change', event => {
   reader.readAsArrayBuffer(file);
 });
 
-$('#input .ppk').addEventListener('change', event => {
-  const file = event.target.files[0];
+$('#input .ppk', HTMLInputElement).addEventListener('change', function(event) {
+  const file = assertNotNull(this.files)[0];
   if (!file) {
     return;
   }
@@ -51,27 +97,37 @@ function generatePlugin() {
     });
 }
 
+/**
+ * @param {any} output
+ * @param {boolean} hasPrivateKey
+ */
 function outputResult(output, hasPrivateKey) {
-  $('#output-error').classList.add('hide');
-  $('#output').classList.remove('hide');
-  $('#output .id').textContent = output.id;
-  $('#output .plugin').href = URL.createObjectURL(new Blob([output.plugin], {type: 'application/zip'}));
+  $e('#output-error').classList.add('hide');
+  $e('#output').classList.remove('hide');
+  $e('#output .id').textContent = output.id;
+  $('#output .plugin', HTMLAnchorElement).href = URL.createObjectURL(new Blob([output.plugin], {type: 'application/zip'}));
   if (hasPrivateKey) {
-    $('#output .ppk').parentNode.classList.add('hide');
+    $e('#output .ppk-item').classList.add('hide');
   } else {
-    $('#output .ppk').parentNode.classList.remove('hide');
-    $('#output .ppk').href = URL.createObjectURL(new Blob([output.privateKey], {type: 'text/plain'}));
+    $e('#output .ppk-item').classList.remove('hide');
+    $('#output .ppk', HTMLAnchorElement).href = URL.createObjectURL(new Blob([output.privateKey], {type: 'text/plain'}));
   }
 }
 
+/**
+ * @param {any} e
+ */
 function outputError(e) {
-  $('#output').classList.add('hide');
-  $('#output-error').classList.remove('hide');
+  $e('#output').classList.add('hide');
+  $e('#output-error').classList.remove('hide');
+  /**
+   * @type {any[]}
+   */
   let errors = e.validationErrors;
   if (!e.validationErrors) {
     errors = [e.message];
   }
-  const ul = $('#output-error .messages');
+  const ul = $e('#output-error .messages');
   ul.innerHTML = '';
   errors.forEach(error => {
     const li = document.createElement('li');
