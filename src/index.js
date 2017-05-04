@@ -9,9 +9,16 @@ const sign = require('./sign');
 const uuid = require('./uuid');
 
 /**
+ * @typedef {Object} PackerResult
+ * @property {!Buffer} plugin
+ * @property {string} privateKey
+ * @property {string} id
+ */
+
+/**
  * @param {!Buffer} contentsZip The zipped plugin contents directory.
  * @param {string=} privateKey The private key (PKCS#1 PEM).
- * @return {!Promise<{plugin: !Buffer, privateKey: string, id: string}>}
+ * @return {!Promise<!PackerResult>}
  */
 function packer(contentsZip, privateKey) {
   let key;
@@ -43,6 +50,7 @@ function zip(contentsZip, publicKey, signature) {
   return new Promise((res, rej) => {
     const output = new streamBuffers.WritableStreamBuffer();
     const zipFile = new ZipFile();
+    /** @type {?number} */
     let size = null;
     output.on('finish', () => {
       debug(`plugin.zip: ${size} bytes`);

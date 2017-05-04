@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const ZipFile = require('yazl').ZipFile;
 const denodeify = require('denodeify');
+/** @type {function(string, any): !Promise<any>} */
 const writeFile = denodeify(fs.writeFile);
 const mkdirp = denodeify(require('mkdirp'));
 const streamBuffers = require('stream-buffers');
@@ -49,6 +50,7 @@ function cli(pluginDir, options) {
 
   // 4. generate new ppk if not specified
   const ppkFile = options.ppk;
+  /** @type {string?} */
   let privateKey;
   if (ppkFile) {
     debug(`loading an existing key: ${ppkFile}`);
@@ -103,6 +105,7 @@ function createContentsZip(pluginDir, manifest) {
   return new Promise((res, rej) => {
     const output = new streamBuffers.WritableStreamBuffer();
     const zipFile = new ZipFile();
+    /** @type {?number} */
     let size = null;
     output.on('finish', () => {
       debug(`plugin.zip: ${size} bytes`);
@@ -133,7 +136,7 @@ function outputPlugin(outputPath, plugin) {
 /**
  * Load JSON file without caching
  *
- * @param {sting} jsonPath
+ * @param {string} jsonPath
  * @return {Object}
  */
 function loadJson(jsonPath) {
@@ -148,7 +151,11 @@ function loadJson(jsonPath) {
  * @return {function(string): boolean}
  */
 function validateRelativePath(pluginDir) {
-  return str => {
+  /**
+   * @param {string} str
+   * @return {boolean}
+   */
+  const foo = str => {
     try {
       const stat = fs.statSync(path.join(pluginDir, str));
       return stat.isFile();
@@ -156,16 +163,17 @@ function validateRelativePath(pluginDir) {
       return false;
     }
   };
+  return foo;
 }
 
 /**
  * Return validator for `maxFileSize` keyword
  *
  * @param {string} pluginDir
- * @return {function(string, string): boolean}
+ * @return {function(number, string): boolean}
  */
 function validateMaxFileSize(pluginDir) {
-  return (maxBytes, filePath) => {
+  return (/** @type {number} */ maxBytes, /** @type {string} */ filePath) => {
     try {
       const stat = fs.statSync(path.join(pluginDir, filePath));
       return stat.size <= maxBytes;
