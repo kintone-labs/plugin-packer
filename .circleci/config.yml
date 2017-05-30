@@ -51,15 +51,19 @@ jobs:
             - v{{ .Environment.CIRCLE_CACHE_VERSION }}-yarn-cache-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}
             - v{{ .Environment.CIRCLE_CACHE_VERSION }}-yarn-cache-master-{{ .Environment.CIRCLE_JOB }}
       - run:
+          command: git diff
+      - run:
           name: Install dependencies
           command: yarn install
+      - run:
+          command: git diff
       - run:
           name: Test
           command: |
             mkdir -p $TEST_REPORTS
             yarn run circleci
       - run:
-          command: git status
+          command: git diff
       - save_cache:
           key: v{{ .Environment.CIRCLE_CACHE_VERSION }}-yarn-lock-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
           paths:
