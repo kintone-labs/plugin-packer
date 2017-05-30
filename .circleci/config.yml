@@ -58,6 +58,8 @@ jobs:
           command: |
             mkdir -p $TEST_REPORTS
             yarn run circleci
+      - run:
+          command: git status
       - save_cache:
           key: v{{ .Environment.CIRCLE_CACHE_VERSION }}-yarn-lock-{{ .Branch }}-{{ .Environment.CIRCLE_JOB }}-{{ checksum "yarn.lock" }}
           paths:
