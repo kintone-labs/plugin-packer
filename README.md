@@ -1,6 +1,8 @@
 kintone-plugin-packer
 ====
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/teppeis/kintone-plugin-packer.svg)](https://greenkeeper.io/)
+
 [kintone plugin package.sh](https://github.com/kintone/plugin-sdk) in JavaScript
 
 [![npm version][npm-image]][npm-url]
