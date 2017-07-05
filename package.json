@@ -41,7 +41,6 @@
     "@types/debug": "^0.0.29",
     "@types/denodeify": "^1.2.30",
     "@types/meow": "^3.6.2",
-    "@types/mkdirp": "^0.3.29",
     "@types/node": "^8.0.7",
     "@types/stream-buffers": "^3.0.2",
     "adm-zip": "^0.4.7",
@@ -59,7 +58,7 @@
     "rimraf": "^2.6.1",
     "setimmediate": "^1.0.5",
     "sinon": "^2.3.6",
-    "typescript": "^2.3.2",
+    "typescript": "^2.4.1",
     "yauzl": "^2.7.0"
   },
   "homepage": "https://github.com/teppeis/kintone-plugin-packer",
