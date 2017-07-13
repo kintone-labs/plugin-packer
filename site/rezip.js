@@ -13,9 +13,9 @@ const sourceList = require('../src/sourcelist');
 
 // only for typings in JSDoc
 // eslint-disable-next-line no-unused-vars
-class ZipFile extends yauzl.ZipFile {}
+const ZipFile = yauzl.ZipFile;
 // eslint-disable-next-line no-unused-vars
-class Entry extends yauzl.Entry {}
+const Entry = yauzl.Entry;
 
 /**
  * Extract, validate and rezip contents.zip
