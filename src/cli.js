@@ -173,7 +173,7 @@ function validateRelativePath(pluginDir) {
  * @return {function(number, string): boolean}
  */
 function validateMaxFileSize(pluginDir) {
-  return (/** @type {number} */ maxBytes, /** @type {string} */ filePath) => {
+  return (maxBytes, filePath) => {
     try {
       const stat = fs.statSync(path.join(pluginDir, filePath));
       return stat.size <= maxBytes;
