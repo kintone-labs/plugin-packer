@@ -1325,6 +1325,14 @@ globby@^5.0.0:
     pify "^2.0.0"
     pinkie-promise "^2.0.0"
 
+google-closure-compiler@<20170626.0.0:
+  version "20170521.0.0"
+  resolved "https://registry.npmjs.org/google-closure-compiler/-/google-closure-compiler-20170521.0.0.tgz#4671caf70bd182e4c041ddb0c95f48f77695baa9"
+  dependencies:
+    chalk "^1.0.0"
+    vinyl "^2.0.1"
+    vinyl-sourcemaps-apply "^0.2.0"
+
 google-closure-compiler@>=20170218.0.0:
   version "20170626.0.0"
   resolved "https://registry.npmjs.org/google-closure-compiler/-/google-closure-compiler-20170626.0.0.tgz#0d2a975d345e1aa13b37e55832509d59ba8a87e0"
