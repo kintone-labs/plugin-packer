@@ -12,7 +12,7 @@ function sourceList(manifest) {
     ['desktop', 'css'],
     ['mobile', 'js'],
     ['config', 'js'],
-    ['config', 'css']
+    ['config', 'css'],
   ];
   /** @type {!Array<string>} */
   const list = sourceTypes
