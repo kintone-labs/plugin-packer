@@ -134,6 +134,7 @@ function validateManifest(entries, manifestJson, prefix) {
 
   if (!result.valid) {
     const errors = genErrorMsg(result.errors);
+    // Need to extend Error class, but IE11 cannot exnted builtin...
     /** @type {JSONSchemaError} */
     const e = new Error(errors.join(', '));
     e.validationErrors = errors;
