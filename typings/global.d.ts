@@ -3,3 +3,5 @@
 interface JSONSchemaError extends Error {
   validationErrors?: string[];
 }
+
+declare module "*";

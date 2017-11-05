@@ -1,9 +1,11 @@
 'use strict';
 
+require('util.promisify/shim')();
+
 const path = require('path');
+const util = require('util');
 const yazl = require('yazl');
 const yauzl = require('yauzl');
-const denodeify = require('denodeify');
 const validate = require('@teppeis/kintone-plugin-manifest-validator');
 const streamBuffers = require('stream-buffers');
 const bind = require('bind.ts').default;
@@ -58,7 +60,7 @@ function rezip(contentsZip) {
  * @return {!Promise<!RezipResult>}
  */
 function zipEntriesFromBuffer(contentsZip) {
-  return denodeify(yauzl.fromBuffer)(contentsZip)
+  return util.promisify(yauzl.fromBuffer)(contentsZip)
     .then(zipFile => new Promise((res, rej) => {
       /** @type {!Map<string, !Entry>} */
       const entries = new Map();
@@ -155,7 +157,7 @@ function rezipContents(zipFile, entries, manifestJson, prefix) {
       res(output.getContents());
     });
     newZipFile.outputStream.pipe(output);
-    const openReadStream = denodeify(bind(zipFile.openReadStream, zipFile));
+    const openReadStream = util.promisify(bind(zipFile.openReadStream, zipFile));
     Promise.all(sourceList(manifestJson).map(src => {
       const entry = entries.get(path.join(prefix, src));
       if (!entry) throw new Error(`Entry is not found for ${src}`);

@@ -1,13 +1,14 @@
 'use strict';
 
-const path = require('path');
-const fs = require('fs');
-const ZipFile = require('yazl').ZipFile;
-const denodeify = require('denodeify');
+require('util.promisify/shim')();
 
-/** @type {function(string, any): !Promise<any>} */
-const writeFile = denodeify(fs.writeFile);
-const mkdirp = denodeify(require('mkdirp'));
+const fs = require('fs');
+const path = require('path');
+const util = require('util');
+const ZipFile = require('yazl').ZipFile;
+
+const writeFile = util.promisify(fs.writeFile);
+const mkdirp = util.promisify(require('mkdirp'));
 const streamBuffers = require('stream-buffers');
 const debug = require('debug')('cli');
 const validate = require('@teppeis/kintone-plugin-manifest-validator');
@@ -131,7 +132,7 @@ function createContentsZip(pluginDir, manifest) {
  */
 function outputPlugin(outputPath, plugin) {
   return writeFile(outputPath, plugin)
-    .then(arg => outputPath);
+    .then(() => outputPath);
 }
 
 /**

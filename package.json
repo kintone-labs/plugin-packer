@@ -31,16 +31,15 @@
     "@types/mkdirp": "^0.5.0",
     "bind.ts": "^1.1.4",
     "debug": "^2.6.8",
-    "denodeify": "^1.2.1",
     "meow": "^3.7.0",
     "mkdirp": "^0.5.1",
     "node-rsa": "~0.4.2",
     "stream-buffers": "^3.0.1",
+    "util.promisify": "^1.0.0",
     "yazl": "^2.4.2"
   },
   "devDependencies": {
     "@types/debug": "^0.0.29",
-    "@types/denodeify": "^1.2.30",
     "@types/meow": "^3.6.2",
     "@types/node": "^8.0.7",
     "@types/stream-buffers": "^3.0.2",
