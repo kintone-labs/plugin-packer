@@ -1,11 +1,14 @@
 'use strict';
 
-const path = require('path');
+require('util.promisify/shim')();
+
 const fs = require('fs');
+const path = require('path');
+const util = require('util');
 const ZipFile = require('yazl').ZipFile;
-const denodeify = require('denodeify');
-const writeFile = denodeify(fs.writeFile);
-const mkdirp = denodeify(require('mkdirp'));
+
+const writeFile = util.promisify(fs.writeFile);
+const mkdirp = util.promisify(require('mkdirp'));
 const streamBuffers = require('stream-buffers');
 const debug = require('debug')('cli');
 const validate = require('@teppeis/kintone-plugin-manifest-validator');
@@ -49,6 +52,7 @@ function cli(pluginDir, options) {
 
   // 4. generate new ppk if not specified
   const ppkFile = options.ppk;
+  /** @type {string?} */
   let privateKey;
   if (ppkFile) {
     debug(`loading an existing key: ${ppkFile}`);
@@ -103,6 +107,7 @@ function createContentsZip(pluginDir, manifest) {
   return new Promise((res, rej) => {
     const output = new streamBuffers.WritableStreamBuffer();
     const zipFile = new ZipFile();
+    /** @type {?number} */
     let size = null;
     output.on('finish', () => {
       debug(`plugin.zip: ${size} bytes`);
@@ -127,7 +132,7 @@ function createContentsZip(pluginDir, manifest) {
  */
 function outputPlugin(outputPath, plugin) {
   return writeFile(outputPath, plugin)
-    .then(arg => outputPath);
+    .then(() => outputPath);
 }
 
 /**
@@ -148,7 +153,11 @@ function loadJson(jsonPath) {
  * @return {function(string): boolean}
  */
 function validateRelativePath(pluginDir) {
-  return str => {
+  /**
+   * @param {string} str
+   * @return {boolean}
+   */
+  const foo = str => {
     try {
       const stat = fs.statSync(path.join(pluginDir, str));
       return stat.isFile();
@@ -156,6 +165,7 @@ function validateRelativePath(pluginDir) {
       return false;
     }
   };
+  return foo;
 }
 
 /**

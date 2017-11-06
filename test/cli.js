@@ -1,15 +1,19 @@
 'use strict';
 
+require('util.promisify/shim')();
+
 const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
+const util = require('util');
 const AdmZip = require('adm-zip');
-const denodeify = require('denodeify');
-const rimraf = denodeify(require('rimraf'));
+
+const rimraf = util.promisify(require('rimraf'));
 const sinon = require('sinon');
 const glob = require('glob');
 
 const cli = require('../src/cli');
+
 const fixturesDir = path.join(__dirname, 'fixtures');
 const sampleDir = path.join(fixturesDir, 'sample-plugin');
 const ppkPath = path.join(fixturesDir, 'private.ppk');
@@ -131,7 +135,7 @@ describe('cli', () => {
 
   it('includes files listed in manifest.json only', () => {
     const pluginDir = path.join(fixturesDir, 'plugin-full-manifest');
-    let packer = sinon.stub().returns({
+    const packer = sinon.stub().returns({
       id: ID,
       privateKey: PRIVATE_KEY,
       plugin: PLUGIN_BUFFER,
@@ -159,7 +163,7 @@ describe('cli', () => {
     const pluginDir = path.join(sampleDir, 'plugin-dir');
     const outputDir = path.join('test', '.output');
     const outputPluginPath = path.join(outputDir, 'foo.zip');
-    let packer = sinon.stub().returns({
+    const packer = sinon.stub().returns({
       id: ID,
       privateKey: PRIVATE_KEY,
       plugin: PLUGIN_BUFFER,
