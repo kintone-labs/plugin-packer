@@ -2,6 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
   <title>Package your kintone plug-in!</title>
   <link rel="stylesheet" href="./dist/normalize.min.css">
   <link rel="stylesheet" href="./style.css">
@@ -15,32 +16,72 @@ gtag('config', 'UA-378780-11');
   <script src="./dist/bundle.js" defer></script>
 </head>
 <body>
-  <h1>Package your kintone plug-in!</h1>
-  <div id=input>
-    <p>Upload the zipped plug-in file.<br>
-    A secret key file and a signed plug-in file will be generated.<br>
-    The secret key will also need to be uploaded when repackaging your plug-in.</p>
-    <ul>
-      <li>Zip file: <input type=file class=contents></li>
-      <li>Secret key file (optional): <input type=file class=ppk></li>
-    </ul>
-  </div>
-
-  <div id=output class="hide">
-    <h2>Packaging plug-in is completed.</h2>
-    <ul>
-      <li>ID: <span class=id></span></li>
-      <li><a class=plugin download=plugin.zip>plugin.zip</a></li>
-      <li><a class=ppk download=private.ppk>private.ppk</a></li>
-    </ul>
-    <button class=clear>Clear</button>
-  </div>
-
-  <div id=output-error class="hide">
-    <h2>Error</h2>
-    <ul class=messages></ul>
-    <button class=clear>Clear</button>
-  </div>
-  <p>Lang: <a href="./index-ja.html">JP</a></p>
+  <header>
+    <h1>Package your kintone plug-in!</h1>
+  </header>
+  <main>
+    <section>
+      <p class="description">
+        Upload the zipped plug-in file.<br>
+        A secret key file and a signed plug-in file will be generated.<br>
+        The secret key will also need to be uploaded when repackaging your plug-in.
+      </p>
+    </section>
+    <section id=input>
+      <div class="upload-area-wrapper">
+        <div class="upload-area js-upload">
+          <p>Drop your kintone plugin zip!</p>
+          <input type=file class=contents style="display: none">
+        </div>
+        <div class="upload-area js-upload">
+          <p>Drop your secret key file(.ppk) (Optional)</p>
+          <input type=file class=ppk style="display: none">
+        </div>
+      </div>
+    </section>
+    <section id=output-error class="hide output-error">
+      <h2>Error</h2>
+      <ul class=messages><li>hogehoge</li></ul>
+      <button class="clear clear-btn">Clear</button>
+    </section>
+    <section id=output class="hide">
+      <h2>Pnnackaging plug-in is completed.</h2>
+      <ul>
+        <li>ID: <span class=id></span></li>
+        <li><a class=plugin download=plugin.zip>plugin.zip</a></li>
+        <li><a class=ppk download=private.ppk>private.ppk</a></li>
+      </ul>
+      <button class="clear clear-btn">Clear</button>
+    </section>
+    <section class="btn-area">
+      <button class="btn create">Create</button>
+      <button class="btn clear">Reset</button>
+    </section>
+  </main>
+  <footer>
+      <p>Lang: <a href="./index-ja.html">JP</a></p>
+  </footer>
+  <div class="temp-file"></div>
 </body>
+<script>
+  let $file;
+  const listener = (e) => {
+    console.log('seleted', e);
+  };
+  document.querySelectorAll('.js-upload').forEach((el) => {
+    el.addEventListener('click', (e) => {
+      const $body = document.querySelector('.temp-file');
+      if ($file) {
+        $file.removeEventListener('change', listener);
+        $body.removeChild($file);
+        $file = null;
+      }
+      $file = document.createElement('input');
+      $file.type = 'file';
+      $file.addEventListener('change', listener);
+      $body.appendChild($file);
+      $file.click();
+    });
+  });
+</script>
 </html>
