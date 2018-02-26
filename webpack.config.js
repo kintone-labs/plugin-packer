@@ -13,5 +13,7 @@ module.exports = {
   },
   devServer: {
     contentBase: path.resolve(__dirname, 'docs'),
+    publicPath: '/dist/',
+    watchContentBase: true,
   },
 };
