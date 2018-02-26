@@ -15,5 +15,6 @@ module.exports = {
     contentBase: path.resolve(__dirname, 'docs'),
     publicPath: '/dist/',
     watchContentBase: true,
+    open: true,
   },
 };

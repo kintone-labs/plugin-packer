@@ -19,10 +19,16 @@
     "css": "cssnano node_modules/normalize.css/normalize.css --safe > docs/dist/normalize.min.css",
     "eslint": "eslint bin src site test",
     "js": "webpack --mode production",
+    "js:dev": "webpack-dev-server --mode development",
     "mocha": "mocha --require intelli-espower-loader",
     "site": "run-p js css",
-    "start": "webpack-dev-server --mode development",
+    "site:dev": "run-p css js:dev",
     "test": "run-s eslint mocha"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm test && npm run site && git add docs"
+    }
   },
   "dependencies": {
     "@teppeis/kintone-plugin-manifest-validator": "^0.6.1",
@@ -40,6 +46,7 @@
     "eslint": "^4.10.0",
     "eslint-config-teppeis": "^6.3.1",
     "glob": "^7.1.1",
+    "husky": "^0.15.0-rc.8",
     "intelli-espower-loader": "^1.0.1",
     "mocha": "^4.0.1",
     "normalize.css": "^7.0.0",
