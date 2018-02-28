@@ -6,6 +6,7 @@
   <title>Package your kintone plug-in!</title>
   <link rel="stylesheet" href="./dist/normalize.min.css">
   <link rel="stylesheet" href="./style.css">
+  <script defer src="https://use.fontawesome.com/releases/v5.0.7/js/all.js"></script>
   <script async src="https://www.googletagmanager.com/gtag/js?id=UA-378780-11"></script>
   <script>
 window.dataLayer = window.dataLayer || [];
@@ -29,33 +30,37 @@ gtag('config', 'UA-378780-11');
     </section>
     <section id=input>
       <div class="upload-area-wrapper">
-        <div class="upload-area js-upload">
-          <p>Drop your kintone plugin zip!</p>
-          <input type=file class=contents style="display: none">
+        <div class="upload-area js-upload js-upload-zip">
+          <p>
+            <span class="hide js-zip-ok-icon"><i class="fas fa-check-circle"></i></span>
+            Drop your kintone plugin zip!
+          </p>
+          <input type=file class="js-file-upload" accept=".zip">
         </div>
-        <div class="upload-area js-upload">
-          <p>Drop your secret key file(.ppk) (Optional)</p>
-          <input type=file class=ppk style="display: none">
+        <div class="upload-area js-upload js-upload-ppk">
+          <p>
+            <span class="hide js-ppk-ok-icon"><i class="fas fa-check-circle"></i></span>
+            Drop your secret key file(.ppk) (Optional)
+          </p>
+          <input type=file class="js-file-upload" accept=".ppk">
         </div>
       </div>
     </section>
     <section id=output-error class="hide output-error">
       <h2>Error</h2>
       <ul class=messages><li>hogehoge</li></ul>
-      <button class="clear clear-btn">Clear</button>
     </section>
     <section id=output class="hide">
-      <h2>Pnnackaging plug-in is completed.</h2>
+      <h2>Packaging plug-in is completed.</h2>
       <ul>
         <li>ID: <span class=id></span></li>
         <li><a class=plugin download=plugin.zip>plugin.zip</a></li>
         <li><a class=ppk download=private.ppk>private.ppk</a></li>
       </ul>
-      <button class="clear clear-btn">Clear</button>
     </section>
     <section class="btn-area">
-      <button class="btn create">Create</button>
-      <button class="btn clear">Reset</button>
+      <button class="btn create js-create-btn disabled">Create</button>
+      <button class="btn clear cler-btn js-clear-btn">Reset</button>
     </section>
   </main>
   <footer>
@@ -63,25 +68,4 @@ gtag('config', 'UA-378780-11');
   </footer>
   <div class="temp-file"></div>
 </body>
-<script>
-  let $file;
-  const listener = (e) => {
-    console.log('seleted', e);
-  };
-  document.querySelectorAll('.js-upload').forEach((el) => {
-    el.addEventListener('click', (e) => {
-      const $body = document.querySelector('.temp-file');
-      if ($file) {
-        $file.removeEventListener('change', listener);
-        $body.removeChild($file);
-        $file = null;
-      }
-      $file = document.createElement('input');
-      $file.type = 'file';
-      $file.addEventListener('change', listener);
-      $body.appendChild($file);
-      $file.click();
-    });
-  });
-</script>
 </html>

@@ -1,75 +1,177 @@
 'use strict';
 
 require('setimmediate'); // polyfill
-const Buffer = require('buffer').Buffer;
-const rezip = require('./rezip');
-const packer = require('../src/');
+const {readText, readArrayBuffer} = require('./file');
+const generatePlugin = require('./generatePlugin');
 
+// utils for DOM API
 const $ = document.querySelector.bind(document);
-let contents;
-let privateKey;
+const $$ = document.querySelectorAll.bind(document);
+const listen = (el, ...args) => el.addEventListener(...args);
 
-$('#input .contents').addEventListener('change', function(event) {
-  const file = this.files[0];
+const createInitialState = () => ({
+  contents: null,
+  ppk: null,
+  plugin: {
+    id: null,
+    url: {
+      contents: null,
+      ppk: null,
+    },
+  },
+  error: null,
+});
+
+let state = createInitialState();
+
+const createDownloadUrls = result => {
+  Object.keys(state.plugin.url).forEach(key => {
+    URL.revokeObjectURL(state.plugin.url[key]);
+  });
+  state.plugin.url.contents = URL.createObjectURL(
+    new Blob([result.plugin], {type: 'application/zip'})
+  );
+  state.plugin.url.ppk = URL.createObjectURL(
+    new Blob([result.privateKey], {type: 'text/plain'})
+  );
+};
+
+const $ppkFileUploader = $('.js-upload-ppk .js-file-upload');
+const $zipFileUploader = $('.js-upload-zip .js-file-upload');
+const $UploadArea = $('.js-upload');
+const $zipDropArea = $('.js-upload-zip');
+const $ppkDropArea = $('.js-upload-ppk');
+const $createBtn = $('.js-create-btn');
+const $clearBtn = $('.js-clear-btn');
+const $$fileUploaders = $$('.js-file-upload');
+const $zipOkIcon = $('.js-zip-ok-icon');
+const $ppkOkIcon = $('.js-ppk-ok-icon');
+
+const handleUploadedPPK = e => {
+  const file = e.target.files[0];
   if (!file) {
     return;
   }
-  const reader = new FileReader();
-  reader.onload = () => {
-    contents = reader.result;
-    generatePlugin();
-  };
-  reader.readAsArrayBuffer(file);
-});
+  readText(file).then(text => {
+    state.ppk = text;
+    render(state);
+  });
+};
 
-$('#input .ppk').addEventListener('change', function(event) {
-  const file = this.files[0];
+const handleUploadedPluginZip = e => {
+  const isDrop = e.type === 'drop';
+  const file = isDrop ?
+    e.dataTransfer.files[0] :
+    e.target.files[0];
   if (!file) {
     return;
   }
-  const reader = new FileReader();
-  reader.onload = () => {
-    privateKey = reader.result;
-    generatePlugin();
-  };
-  reader.readAsText(file);
-});
-
-document.querySelectorAll('.clear').forEach(button => {
-  button.addEventListener('click', clearAll);
-});
-
-function generatePlugin() {
-  if (!contents) {
-    return Promise.resolve();
+  // console.log(file);
+  if (isDrop) {
+    e.preventDefault();
   }
-  return rezip(Buffer.from(contents))
-    .then(contentsZip => packer(contentsZip, privateKey))
-    .then(output => {
-      console.log('result', output.id);
-      outputResult(output, !!privateKey);
-    }).catch(e => {
-      console.error(e);
-      outputError(e);
-    });
-}
+  readArrayBuffer(file).then(buffer => {
+    state.contents = buffer;
+    render(state);
+  });
+};
 
-function outputResult(output, hasPrivateKey) {
+// Handle a file upload
+listen($zipFileUploader, 'change', handleUploadedPluginZip);
+listen($ppkFileUploader, 'change', handleUploadedPPK);
+
+// Hanlde a drag and drop
+listen($zipDropArea, 'drop', handleUploadedPluginZip);
+listen($ppkDropArea, 'drop', handleUploadedPPK);
+listen($UploadArea, 'dragover', e => {
+  e.preventDefault();
+  renderDragOver(e.currentTarget);
+});
+listen($UploadArea, 'dragleave', e => {
+  renderDragLeave(e.currentTarget);
+});
+
+// Handle click a button
+listen($createBtn, 'click', () => {
+  if (!state.contents) return;
+  generatePlugin(state.contents, state.ppk)
+    .then(result => {
+      state.plugin.id = result.id;
+      createDownloadUrls(result);
+    })
+    .catch(error => {
+      state.error = error;
+    })
+    .then(() => render(state));
+});
+listen($clearBtn, 'click', () => {
+  state = createInitialState();
+  render(state);
+  $$fileUploaders.forEach(el => {
+    el.value = null;
+  });
+});
+
+const render = state => {
+  renderResult(state);
+  renderUploadPPKArea(state);
+  renderUploadZipArea(state);
+};
+
+const renderDragOver = el => {
+  el.style.backgroundColor = '#EEE';
+};
+
+const renderDragLeave = el => {
+  el.style.backgroundColor = '#FFF';
+};
+
+const renderUploadZipArea = state => {
+  renderDragLeave($zipDropArea);
+  if (state.contents) {
+    $createBtn.classList.remove('disabled');
+    $zipOkIcon.classList.remove('hide');
+  } else {
+    $createBtn.classList.add('disabled');
+    $zipOkIcon.classList.add('hide');
+  }
+};
+
+const renderUploadPPKArea = () => {
+  if (state.ppk) {
+    $ppkOkIcon.classList.remove('hide');
+  } else {
+    $ppkOkIcon.classList.add('hide');
+  }
+};
+
+const renderResult = state => {
+  if (state.error) {
+    renderErrorMessages(state);
+  } else if (state.plugin.url.contents) {
+    renderDownloadLinks(state);
+  } else {
+    $('#output').classList.add('hide');
+  }
+};
+
+function renderDownloadLinks(state) {
   $('#output-error').classList.add('hide');
   $('#output').classList.remove('hide');
-  $('#output .id').textContent = output.id;
-  $('#output .plugin').href = URL.createObjectURL(new Blob([output.plugin], {type: 'application/zip'}));
-  if (hasPrivateKey) {
+  $('#output .id').textContent = state.plugin.id;
+  $('#output .plugin').href = state.plugin.url.contents;
+  if (state.ppk) {
     $('#output .ppk').parentNode.classList.add('hide');
   } else {
     $('#output .ppk').parentNode.classList.remove('hide');
-    $('#output .ppk').href = URL.createObjectURL(new Blob([output.privateKey], {type: 'text/plain'}));
+    $('#output .ppk').href = state.plugin.url.ppk;
   }
 }
 
-function outputError(e) {
+function renderErrorMessages(state) {
   $('#output').classList.add('hide');
   $('#output-error').classList.remove('hide');
+  const e = state.error;
   let errors = e.validationErrors;
   if (!e.validationErrors) {
     errors = [e.message];
@@ -81,11 +183,4 @@ function outputError(e) {
     li.textContent = error;
     ul.appendChild(li);
   });
-}
-
-function clearAll() {
-  $('#input .contents').value = null;
-  $('#input .ppk').value = null;
-  $('#output').classList.add('hide');
-  $('#output-error').classList.add('hide');
 }
