@@ -8,6 +8,8 @@ const generatePlugin = require('./generatePlugin');
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 const listen = (el, ...args) => el.addEventListener(...args);
+const show = el => el.classList.remove('hide');
+const hide = el => el.classList.add('hide');
 
 const createInitialState = () => ({
   contents: null,
@@ -46,6 +48,13 @@ const $clearBtn = $('.js-clear-btn');
 const $$fileUploaders = $$('.js-file-upload');
 const $zipOkIcon = $('.js-zip-ok-icon');
 const $ppkOkIcon = $('.js-ppk-ok-icon');
+
+const $download = $('.js-download');
+const $downloadPlugin = $('.js-download-plugin');
+const $downloadPluginId = $('.js-download-plugin-id');
+const $downloadPPK = $('.js-download-ppk');
+const $error = $('.js-error');
+const $errorMessages = $('.js-error-messages');
 
 const handleUploadedPPK = e => {
   const file = e.target.files[0];
@@ -130,18 +139,18 @@ const renderUploadZipArea = state => {
   renderDragLeave($zipDropArea);
   if (state.contents) {
     $createBtn.classList.remove('disabled');
-    $zipOkIcon.classList.remove('hide');
+    show($zipOkIcon);
   } else {
     $createBtn.classList.add('disabled');
-    $zipOkIcon.classList.add('hide');
+    hide($zipOkIcon);
   }
 };
 
 const renderUploadPPKArea = () => {
   if (state.ppk) {
-    $ppkOkIcon.classList.remove('hide');
+    show($ppkOkIcon);
   } else {
-    $ppkOkIcon.classList.add('hide');
+    hide($ppkOkIcon);
   }
 };
 
@@ -151,32 +160,32 @@ const renderResult = state => {
   } else if (state.plugin.url.contents) {
     renderDownloadLinks(state);
   } else {
-    $('#output').classList.add('hide');
+    hide($error);
   }
 };
 
 function renderDownloadLinks(state) {
-  $('#output-error').classList.add('hide');
-  $('#output').classList.remove('hide');
-  $('#output .id').textContent = state.plugin.id;
-  $('#output .plugin').href = state.plugin.url.contents;
+  hide($error);
+  show($download);
+  $downloadPluginId.textContent = state.plugin.id;
+  $downloadPlugin.href = state.plugin.url.contents;
   if (state.ppk) {
-    $('#output .ppk').parentNode.classList.add('hide');
+    hide($downloadPPK.parentNode);
   } else {
-    $('#output .ppk').parentNode.classList.remove('hide');
-    $('#output .ppk').href = state.plugin.url.ppk;
+    show($downloadPPK.parentNode);
+    $downloadPPK.href = state.plugin.url.ppk;
   }
 }
 
 function renderErrorMessages(state) {
-  $('#output').classList.add('hide');
-  $('#output-error').classList.remove('hide');
+  hide($download);
+  show($error);
   const e = state.error;
   let errors = e.validationErrors;
   if (!e.validationErrors) {
     errors = [e.message];
   }
-  const ul = $('#output-error .messages');
+  const ul = $errorMessages;
   ul.innerHTML = '';
   errors.forEach(error => {
     const li = document.createElement('li');
@@ -184,3 +193,5 @@ function renderErrorMessages(state) {
     ul.appendChild(li);
   });
 }
+
+render(state);

@@ -21,51 +21,67 @@ gtag('config', 'UA-378780-11');
     <h1>Package your kintone plug-in!</h1>
   </header>
   <main>
-    <section>
-      <p class="description">
+    <section class="description">
+      <p class="description-lead">
         Upload the zipped plug-in file.<br>
         A secret key file and a signed plug-in file will be generated.<br>
         The secret key will also need to be uploaded when repackaging your plug-in.
       </p>
     </section>
-    <section id=input>
+    <section>
       <div class="upload-area-wrapper">
         <div class="upload-area js-upload js-upload-zip">
           <p>
             <span class="hide js-zip-ok-icon"><i class="fas fa-check-circle"></i></span>
-            Drop your kintone plugin zip!
+            Drop your kintone plugin zip
+            <i class="far fa-folder"></i>
           </p>
           <input type=file class="js-file-upload" accept=".zip">
         </div>
         <div class="upload-area js-upload js-upload-ppk">
           <p>
             <span class="hide js-ppk-ok-icon"><i class="fas fa-check-circle"></i></span>
-            Drop your secret key file(.ppk) (Optional)
+            Drop your secret key file(.ppk)
+            <i class="fas fa-key"></i>
+            (optional)
           </p>
           <input type=file class="js-file-upload" accept=".ppk">
         </div>
       </div>
     </section>
-    <section id=output-error class="hide output-error">
-      <h2>Error</h2>
-      <ul class=messages><li>hogehoge</li></ul>
-    </section>
-    <section id=output class="hide">
-      <h2>Packaging plug-in is completed.</h2>
-      <ul>
-        <li>ID: <span class=id></span></li>
-        <li><a class=plugin download=plugin.zip>plugin.zip</a></li>
-        <li><a class=ppk download=private.ppk>private.ppk</a></li>
+    <section class="hide download js-download">
+      <h2 class="download-heading">Success!</h2>
+      <ul class="download-list">
+        <li>
+          ID: <span class="download-plugin-id js-download-plugin-id"></span>
+        </li>
+        <li>
+         <i class="fas fa-check-circle"></i>
+          <i class="far fa-folder"></i>
+          <a class="js-download-plugin" download="plugin.zip">
+            plugin.zip
+          </a>
+        </li>
+        <li>
+          <i class="fas fa-check-circle"></i>
+          <i class="fas fa-key"></i>
+          <a class="js-download-ppk" download="private.ppk">
+            private.ppk
+          </a>
+        </li>
       </ul>
     </section>
+    <section class="hide output-error js-error">
+      <h2>Error</h2>
+      <ul class="error-messages js-error-messages"><li>hogehoge</li></ul>
+    </section>
     <section class="btn-area">
-      <button class="btn create js-create-btn disabled">Create</button>
-      <button class="btn clear cler-btn js-clear-btn">Reset</button>
+      <button class="btn btn-create js-create-btn disabled">Create</button>
+      <button class="btn btn-clear cler-btn js-clear-btn">Reset</button>
     </section>
   </main>
   <footer>
       <p>Lang: <a href="./index-ja.html">JP</a></p>
   </footer>
-  <div class="temp-file"></div>
 </body>
 </html>

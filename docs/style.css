@@ -23,14 +23,26 @@ li {
   list-style: none;
 }
 
-.description {
-  padding: 1rem;
-  font-size: 1.2rem;
-  line-height: 1.3;
-  text-align: center;
+input[type="file"] {
+  font-size: 0.8rem;
 }
+
+.hide {
+  display: none;
+}
+
+/** font awesome */
 .fa-check-circle {
   color: #74b816;
+}
+.fa-folder {
+  color: #444;
+}
+
+.description {
+  margin: 1rem 3rem;
+  font-size: 1.2rem;
+  line-height: 1.3;
 }
 
 .upload-area-wrapper {
@@ -48,36 +60,27 @@ li {
   border: dashed 5px #CCC;
 }
 
-input[type="file"] {
-  font-size: 0.8rem;
+.download {
+  font-size: 1.2rem;
+  color: #444;
+  line-height: 1.5;
+}
+
+.download-heading {
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.download-list {
+  width: 50%;
+  margin: 0 auto;
+  padding: 1rem;
+  border: dashed 3px rgba(116, 184, 22, 0.4);
 }
 
 .clear-btn {
   display: inline-block;
   margin: 1rem;
-}
-
-.output-error {
-  color: tomato;
-  text-align: center;
-}
-
-.output-error > h2 {
-  margin: 1rem;
-}
-
-.clear {
-  padding: 4px 16px;
-}
-
-.hide {
-  display: none;
-}
-
-.temp-file {
-  height: 0;
-  width: 0;
-  overflow: hidden;
 }
 
 .btn-area {
@@ -95,14 +98,14 @@ input[type="file"] {
   opacity: 0.7;
 }
 
-.btn.create {
+.btn-create {
   background-color: #3498db;
   color: #FFF;
 }
-.btn.clear {
+.btn-clear {
   background-color: #EEE;
   color: #444;
 }
-.btn.create.disabled {
+.btn-create.disabled {
   opacity: 0.3;
 }
