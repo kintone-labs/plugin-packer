@@ -33,19 +33,26 @@ gtag('config', 'UA-378780-11');
         <div class="upload-area js-upload js-upload-zip">
           <p>
             <span class="hide js-zip-ok-icon"><i class="fas fa-check-circle"></i></span>
-            Drop your kintone plugin zip
             <i class="far fa-folder"></i>
+            <a href="" class="upload-zip-link js-upload-zip-link">
+              Drop your kintone plugin zip!
+            </a><br />
+            <i class="fas fa-upload"></i>
+            <span class="js-zip-file-name"></span>
+            <input type=file class="file-upload js-file-upload" accept=".zip" tabindex="-1">
           </p>
-          <input type=file class="js-file-upload" accept=".zip">
         </div>
         <div class="upload-area js-upload js-upload-ppk">
-          <p>
             <span class="hide js-ppk-ok-icon"><i class="fas fa-check-circle"></i></span>
-            Drop your secret key file(.ppk)
             <i class="fas fa-key"></i>
-            (optional)
+            <a href="" class="upload-ppk-link js-upload-ppk-link">
+              Drop your secret key file(.ppk)
+            </a>
+            (optional)<br />
+            <i class="fas fa-upload"></i>
+            <span class="js-ppk-file-name"></span>
+            <input type=file class="file-upload js-file-upload" accept=".ppk" tabInde="-1">
           </p>
-          <input type=file class="js-file-upload" accept=".ppk">
         </div>
       </div>
     </section>
@@ -71,12 +78,15 @@ gtag('config', 'UA-378780-11');
         </li>
       </ul>
     </section>
-    <section class="hide output-error js-error">
-      <h2>Error</h2>
-      <ul class="error-messages js-error-messages"><li>hogehoge</li></ul>
+    <section class="hide error js-error">
+      <h2 class="error-heading">Failed</h2>
+      <ul class="error-messages js-error-messages"></ul>
     </section>
     <section class="btn-area">
       <button class="btn btn-create js-create-btn disabled">Create</button>
+      <button class="btn btn-create js-create-loading-btn hide">
+        <span class="loading"><i class="fas fa-spinner"></i></span>
+      </button>
       <button class="btn btn-clear cler-btn js-clear-btn">Reset</button>
     </section>
   </main>
