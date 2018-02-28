@@ -9,7 +9,7 @@ const {
 } = require('./dom');
 const {
   createInitialState,
-} = require('./state');
+} = require('./reducer');
 const View = require('./view');
 const {
   handleUploadedPPK,

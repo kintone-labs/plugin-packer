@@ -16,7 +16,7 @@ const {
   finishLoading,
   startCreatingPlugin,
   createInitialState,
-} = require('./state');
+} = require('./reducer');
 
 const handleUploadedPPK = (state, file) => readText(file)
   .then(text => {
