@@ -69,8 +69,6 @@ module.exports = {
   delay,
   revokePluginUrls,
   createDownloadUrls,
-  isDropEvent,
-  getFileFromEvent,
   createFileHanlder,
   readText,
   readArrayBuffer,
