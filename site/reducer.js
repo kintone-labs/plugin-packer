@@ -1,8 +1,18 @@
 'use strict';
 
 const {createDownloadUrls} = require('./dom');
+const {
+  UPLOAD_PPK,
+  UPLOAD_PLUGIN,
+  UPLOAD_PLUGIN_START,
+  UPLOAD_PLUGIN_FAILURE,
+  CREATE_PLUGIN_ZIP,
+  CREATE_PLUGIN_ZIP_START,
+  CREATE_PLUGIN_ZIP_FAILURE,
+  RESET,
+} = require('./action');
 
-const createInitialState = () => ({
+const getInitialState = () => ({
   contents: {
     data: null,
     name: null,
@@ -22,57 +32,50 @@ const createInitialState = () => ({
   loading: false,
 });
 
-const resetPlugin = state => (
-  Object.assign({}, state, {
-    plugin: {
-      id: null,
-      url: {
-        contents: null,
-        ppk: null,
-      },
-    },
-  })
-);
-
-const setError = (state, error) => Object.assign({}, state, {error});
-const setPlugin = (state, result) => Object.assign({}, state, {
-  ppk: {
-    data: result.privateKey,
-    name: state.ppk.name || `${result.id}.ppk`,
-  },
-  plugin: {
-    id: result.id,
-    url: createDownloadUrls(result),
-  },
-});
-const setContents = (state, contents) => Object.assign({}, state, {contents});
-const startLoading = state => Object.assign({}, state, {loading: true});
-const resetError = state => Object.assign({}, state, {error: null});
-const finishLoading = state => Object.assign({}, state, {loading: false});
-
-const startCreatingPlugin = state => startLoading(
-  resetError(
-    resetPlugin(
-      state
-    )
-  )
-);
-const startUploadPPK = (state, ppk) => Object.assign({}, state, {ppk});
-const startUploadZip = state => resetError(
-  Object.assign({}, state, {
-    contents: {
-      data: null,
-      name: null,
-    },
-  }));
-
-module.exports = {
-  createInitialState,
-  finishLoading,
-  setError,
-  setPlugin,
-  startCreatingPlugin,
-  startUploadPPK,
-  startUploadZip,
-  setContents,
+const reducer = (state = getInitialState(), action) => {
+  switch (action.type) {
+    case UPLOAD_PPK:
+      return Object.assign({}, state, {
+        ppk: action.payload,
+      });
+    case UPLOAD_PLUGIN_START:
+      return Object.assign({}, state, {
+        contents: getInitialState().contents,
+        error: null,
+      });
+    case UPLOAD_PLUGIN:
+      return Object.assign({}, state, {
+        contents: action.payload,
+      });
+    case CREATE_PLUGIN_ZIP_START:
+      return Object.assign({}, state, {
+        plugin: getInitialState().plugin,
+        error: null,
+        loading: true,
+      });
+    case CREATE_PLUGIN_ZIP:
+      return Object.assign({}, state, {
+        ppk: {
+          data: action.payload.privateKey,
+          name: state.ppk.name || `${action.payload.id}.ppk`,
+        },
+        plugin: {
+          id: action.payload.id,
+          url: createDownloadUrls(action.payload),
+        },
+        loading: false,
+      });
+    case UPLOAD_PLUGIN_FAILURE:
+    case CREATE_PLUGIN_ZIP_FAILURE:
+      return Object.assign({}, state, {
+        error: action.payload,
+        loading: false,
+      });
+    case RESET:
+      return getInitialState();
+    default:
+      return state;
+  }
 };
+
+module.exports = reducer;

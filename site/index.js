@@ -1,22 +1,27 @@
 'use strict';
 
 require('setimmediate'); // polyfill
+
+const {createStore, applyMiddleware} = require('redux');
+const thunk = require('redux-thunk').default;
+const logger = require('redux-logger').default;
+
 const {
   $,
   $$,
   listen,
   createFileHanlder,
+  revokePluginUrls,
 } = require('./dom');
-const {
-  createInitialState,
-} = require('./reducer');
 const View = require('./view');
+
+const reducer = require('./reducer');
 const {
-  handleUploadedPPK,
-  handleUploadedPluginZip,
-  handleCreateBtn,
-  handleClearBtn,
-} = require('./handler');
+  uploadPPK,
+  uploadPlugin,
+  createPluginZip,
+  reset,
+} = require('./action');
 
 const $ppkFileUploader = $('.js-upload-ppk .js-file-upload');
 const $zipFileUploader = $('.js-upload-zip .js-file-upload');
@@ -65,20 +70,27 @@ const view = new View({
   zipFileName: $zipFileName,
   ppkFileName: $ppkFileName,
 });
-let state = createInitialState();
 
-const render = () => view.render(state);
-const renderWithNewState = newState => {
-  state = newState;
-  render();
-};
+const middlewares = [thunk];
+if (process.env.NODE_ENV !== 'production') {
+  middlewares.push(logger);
+}
+
+const store = createStore(
+  reducer,
+  applyMiddleware(...middlewares)
+);
+
+store.subscribe(() => {
+  view.render(store.getState());
+});
 
 const uploadPluginZipHandler = createFileHanlder(file => {
-  handleUploadedPluginZip(state, file).then(renderWithNewState);
+  store.dispatch(uploadPlugin(file));
 });
 
 const uploadPPKHanlder = createFileHanlder(file => {
-  handleUploadedPPK(state, file, render).then(renderWithNewState);
+  store.dispatch(uploadPPK(file));
 });
 
 // Handle a file upload
@@ -92,13 +104,20 @@ listen($$fileUploader, 'click', e => {
 });
 
 // Handle click a button
-listen($createBtn, 'click', () => handleCreateBtn(state, renderWithNewState).then(renderWithNewState));
-listen($clearBtn, 'click', () => handleClearBtn().then(newState => {
+listen($createBtn, 'click', () => {
+  const state = store.getState();
+  if (!state.contents.data) {
+    return;
+  }
+  revokePluginUrls(state.plugin);
+  store.dispatch(createPluginZip());
+});
+listen($clearBtn, 'click', () => {
   $$fileUploaders.forEach(el => {
     el.value = null;
   });
-  renderWithNewState(newState);
-}));
+  store.dispatch(reset());
+});
 
 // Handle a click for a select file
 listen($uploadZipLink, 'click', e => {
@@ -119,4 +138,4 @@ listen($$UploadArea, 'dragleave', e => {
   view.decorateDragLeave(e.currentTarget);
 });
 
-render();
+store.dispatch({type: '__INIT__'});
