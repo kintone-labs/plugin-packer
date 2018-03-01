@@ -11,6 +11,12 @@ const CREATE_PLUGIN_ZIP_START = 'CREATE_PLUGIN_ZIP_START';
 const CREATE_PLUGIN_ZIP_FAILURE = 'CREATE_PLUGIN_ZIP_FAILURE';
 const RESET = 'RESET';
 
+/**
+ * Dispatch an action for uploading a ppk file
+ * @param {string} fileName
+ * @param {function(): Promise<string>} fileReader
+ * @return {function(dispatch: function)}
+ */
 const uploadPPK = (fileName, fileReader) => dispatch => {
   fileReader().then(text => dispatch({
     type: UPLOAD_PPK,
@@ -21,12 +27,20 @@ const uploadPPK = (fileName, fileReader) => dispatch => {
   }));
 };
 
+/**
+ * Dispatch an action for uploading a plugin zip
+ * @param {string} fileName
+ * @param {function(): Promise<ArrayBuffer>} fileReader
+ * @param {function(): Promise<void>} validateManifest
+ * @return {function(dispatch: function)}
+ */
 const uploadPlugin = (fileName, fileReader, validateManifest) => dispatch => {
   dispatch({type: UPLOAD_PLUGIN_START});
   fileReader()
     .then(buffer => validateManifest(buffer).then(() => buffer))
     .then(
       buffer => {
+        console.log(buffer);
         dispatch({
           type: UPLOAD_PLUGIN,
           payload: {
@@ -44,6 +58,11 @@ const uploadPlugin = (fileName, fileReader, validateManifest) => dispatch => {
     );
 };
 
+/**
+ * Dispatch an action for creating a plugin zip
+ * @param {function(contents: ArrayBuffer, ppk: string): Promise<*>} generatePluginZip
+ * @return {function(dispatch: function, getState: function)}
+ */
 const createPluginZip = generatePluginZip => (dispatch, getState) => {
   dispatch({
     type: CREATE_PLUGIN_ZIP_START,
@@ -51,6 +70,7 @@ const createPluginZip = generatePluginZip => (dispatch, getState) => {
   const state = getState();
   Promise.all([
     generatePluginZip(state.contents.data, state.ppk.data),
+    // It's to guarantee to wait 300ms to recognize creating a plugin zip an user
     delay(300),
   ]).then(
     ([result]) => {
@@ -67,6 +87,10 @@ const createPluginZip = generatePluginZip => (dispatch, getState) => {
     });
 };
 
+/**
+ * Dispatch an action to reset the state
+ * @return {{type: string}}
+*/
 const reset = () => ({
   type: RESET,
 });

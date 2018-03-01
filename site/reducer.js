@@ -32,6 +32,12 @@ const getInitialState = () => ({
   loading: false,
 });
 
+/**
+ * Reducer for an application
+ * @param {Object} state
+ * @param {{type: string, payload: *}} action
+ * @return {Object}
+ */
 const reducer = (state = getInitialState(), action) => {
   switch (action.type) {
     case UPLOAD_PPK:

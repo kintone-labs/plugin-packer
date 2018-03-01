@@ -66,6 +66,10 @@
   border: dashed 5px #CCC;
 }
 
+.upload-area__droppable--drag {
+  background-color: #EEE;
+}
+
 .upload-area__text {
   position: relative;
 }
