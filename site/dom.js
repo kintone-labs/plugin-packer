@@ -1,19 +1,10 @@
 'use strict';
 
-const revokePluginUrls = plugin => {
-  Object.keys(plugin.url).forEach(key => {
-    URL.revokeObjectURL(plugin.url[key]);
-  });
-};
+const revokeDownloadUrl = url => URL.revokeObjectURL(url);
 
-const createDownloadUrls = result => ({
-  contents: URL.createObjectURL(
-    new Blob([result.plugin], {type: 'application/zip'})
-  ),
-  ppk: URL.createObjectURL(
-    new Blob([result.privateKey], {type: 'text/plain'})
-  ),
-});
+const createDownloadUrl = (data, type) => URL.createObjectURL(
+  new Blob([data], {type})
+);
 
 const isDropEvent = e => e.type === 'drop';
 const getFileFromEvent = e => (
@@ -60,15 +51,12 @@ const listen = (el, ...args) => {
   el.addEventListener(...args);
 };
 
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
-
 module.exports = {
   $,
   $$,
   listen,
-  delay,
-  revokePluginUrls,
-  createDownloadUrls,
+  revokeDownloadUrl,
+  createDownloadUrl,
   createFileHanlder,
   readText,
   readArrayBuffer,

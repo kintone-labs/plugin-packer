@@ -10,8 +10,9 @@ const {
   $,
   $$,
   listen,
+  readText,
+  readArrayBuffer,
   createFileHanlder,
-  revokePluginUrls,
 } = require('./dom');
 const View = require('./view');
 
@@ -22,6 +23,8 @@ const {
   createPluginZip,
   reset,
 } = require('./action');
+const {generatePluginZip, validatePlugin, revokePluginUrls} = require('./plugin');
+
 
 const $ppkFileUploader = $('.js-upload-ppk .js-file-upload');
 const $zipFileUploader = $('.js-upload-zip .js-file-upload');
@@ -86,11 +89,18 @@ store.subscribe(() => {
 });
 
 const uploadPluginZipHandler = createFileHanlder(file => {
-  store.dispatch(uploadPlugin(file));
+  store.dispatch(
+    uploadPlugin(
+      file.name,
+      () => readArrayBuffer(file),
+      validatePlugin
+    ));
 });
 
 const uploadPPKHanlder = createFileHanlder(file => {
-  store.dispatch(uploadPPK(file));
+  store.dispatch(
+    uploadPPK(file.name, () => readText(file))
+  );
 });
 
 // Handle a file upload
@@ -110,7 +120,7 @@ listen($createBtn, 'click', () => {
     return;
   }
   revokePluginUrls(state.plugin);
-  store.dispatch(createPluginZip());
+  store.dispatch(createPluginZip(generatePluginZip));
 });
 listen($clearBtn, 'click', () => {
   $$fileUploaders.forEach(el => {

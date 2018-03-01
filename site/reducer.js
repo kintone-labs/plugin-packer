@@ -1,6 +1,6 @@
 'use strict';
 
-const {createDownloadUrls} = require('./dom');
+const {createDownloadUrls} = require('./plugin');
 const {
   UPLOAD_PPK,
   UPLOAD_PLUGIN,

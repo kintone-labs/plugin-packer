@@ -1,11 +1,6 @@
 'use strict';
 
-const generatePlugin = require('./generatePlugin');
-const {
-  readText,
-  readArrayBuffer,
-  delay,
-} = require('./dom');
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 const UPLOAD_PPK = 'UPLOAD_PPK';
 const UPLOAD_PLUGIN_START = 'UPLOADING_PLUGIN_START';
@@ -16,28 +11,27 @@ const CREATE_PLUGIN_ZIP_START = 'CREATE_PLUGIN_ZIP_START';
 const CREATE_PLUGIN_ZIP_FAILURE = 'CREATE_PLUGIN_ZIP_FAILURE';
 const RESET = 'RESET';
 
-const uploadPPK = file => dispatch => {
-  readText(file).then(text => dispatch({
+const uploadPPK = (fileName, fileReader) => dispatch => {
+  fileReader().then(text => dispatch({
     type: UPLOAD_PPK,
     payload: {
       data: text,
-      name: file.name,
+      name: fileName,
     },
   }));
 };
 
-const uploadPlugin = file => dispatch => {
+const uploadPlugin = (fileName, fileReader, validateManifest) => dispatch => {
   dispatch({type: UPLOAD_PLUGIN_START});
-  readArrayBuffer(file)
-    // in order to validate the uploaded zip before submit
-    .then(buffer => generatePlugin(buffer).then(() => buffer))
+  fileReader()
+    .then(buffer => validateManifest(buffer).then(() => buffer))
     .then(
       buffer => {
         dispatch({
           type: UPLOAD_PLUGIN,
           payload: {
             data: buffer,
-            name: file.name,
+            name: fileName,
           },
         });
       },
@@ -50,13 +44,13 @@ const uploadPlugin = file => dispatch => {
     );
 };
 
-const createPluginZip = () => (dispatch, getState) => {
+const createPluginZip = generatePluginZip => (dispatch, getState) => {
   dispatch({
     type: CREATE_PLUGIN_ZIP_START,
   });
   const state = getState();
   Promise.all([
-    generatePlugin(state.contents.data, state.ppk.data),
+    generatePluginZip(state.contents.data, state.ppk.data),
     delay(300),
   ]).then(
     ([result]) => {
