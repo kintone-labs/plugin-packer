@@ -17,60 +17,60 @@ gtag('config', 'UA-378780-11');
   <script src="./dist/bundle.js" defer></script>
 </head>
 <body>
-  <header>
-    <h1>Package your kintone plug-in!</h1>
+  <header class="header">
+    <h1 class="header__title">Package your kintone plug-in!</h1>
   </header>
   <main>
     <section class="description">
-      <p class="description-lead">
+      <p>
         Upload the zipped plug-in file.<br>
         A secret key file and a signed plug-in file will be generated.<br>
         The secret key will also need to be uploaded when repackaging your plug-in.
       </p>
     </section>
-    <section>
-      <div class="upload-area-wrapper">
-        <div class="upload-area js-upload js-upload-zip">
-          <p>
-            <span class="hide js-zip-ok-icon"><i class="fas fa-check-circle"></i></span>
-            <i class="far fa-folder"></i>
-            <a href="" class="upload-zip-link js-upload-zip-link">
-              Drop your kintone plugin zip!
-            </a><br />
-            <i class="fas fa-upload"></i>
-            <span class="js-zip-file-name"></span>
-            <input type=file class="file-upload js-file-upload" accept=".zip" tabindex="-1">
-          </p>
-        </div>
-        <div class="upload-area js-upload js-upload-ppk">
-            <span class="hide js-ppk-ok-icon"><i class="fas fa-check-circle"></i></span>
-            <i class="fas fa-key"></i>
-            <a href="" class="upload-ppk-link js-upload-ppk-link">
-              Drop your secret key file(.ppk)
-            </a>
-            (optional)<br />
-            <i class="fas fa-upload"></i>
-            <span class="js-ppk-file-name"></span>
-            <input type=file class="file-upload js-file-upload" accept=".ppk" tabInde="-1">
-          </p>
-        </div>
+    <section class="upload-area">
+      <div class="upload-area__droppable js-upload js-upload-zip">
+        <p class="upload-area__text">
+          <span class="hide js-zip-ok-icon ok-icon"><i class="fas fa-check-circle"></i></span>
+          <i class="far fa-folder"></i>
+          <a href="" class="upload-area__zip-link js-upload-zip-link">
+            Drop your kintone plugin zip!
+          </a>
+          <br />
+          <i class="fas fa-upload"></i>
+          <span class="js-zip-file-name"></span>
+          <input type=file class="upload-area__file-upload js-file-upload" accept=".zip" tabindex="-1">
+        </p>
+      </div>
+      <div class="upload-area__droppable js-upload js-upload-ppk">
+        <p class="upload-area__text">
+          <span class="hide js-ppk-ok-icon ok-icon"><i class="fas fa-check-circle"></i></span>
+          <i class="fas fa-key"></i>
+          <a href="" class="upload-area__ppk-link js-upload-ppk-link">
+            Drop your secret key file(.ppk)
+          </a>
+          (optional)<br />
+          <i class="fas fa-upload"></i>
+          <span class="js-ppk-file-name"></span>
+          <input type=file class="upload-area__file-upload js-file-upload" accept=".ppk" tabInde="-1">
+        </p>
       </div>
     </section>
     <section class="hide download js-download">
-      <h2 class="download-heading">Success!</h2>
-      <ul class="download-list">
-        <li>
-          ID: <span class="download-plugin-id js-download-plugin-id"></span>
+      <h2 class="download__title">Success!</h2>
+      <ul class="download__list">
+        <li class="download__list-element">
+          ID: <span class="js-download-plugin-id"></span>
         </li>
-        <li>
-         <i class="fas fa-check-circle"></i>
-          <i class="far fa-folder"></i>
+        <li class="download__list-element">
+          <span class="ok-icon"><i class="fas fa-check-circle"></i></span>
+          <span><i class="far fa-folder"></i></span>
           <a class="js-download-plugin" download="plugin.zip">
             plugin.zip
           </a>
         </li>
-        <li>
-          <i class="fas fa-check-circle"></i>
+        <li class="download__list-element">
+          <span class="ok-icon"><i class="fas fa-check-circle"></i></span>
           <i class="fas fa-key"></i>
           <a class="js-download-ppk" download="private.ppk">
             private.ppk
@@ -79,18 +79,18 @@ gtag('config', 'UA-378780-11');
       </ul>
     </section>
     <section class="hide error js-error">
-      <h2 class="error-heading">Failed</h2>
-      <ul class="error-messages js-error-messages"></ul>
+      <h2 class="error__title">Failed</h2>
+      <ul class="error__messages js-error-messages"></ul>
     </section>
-    <section class="btn-area">
-      <button class="btn btn-create js-create-btn disabled">Create</button>
-      <button class="btn btn-create js-create-loading-btn hide">
+    <section class="action">
+      <button class="action__button action__button--create js-create-btn disabled">Create</button>
+      <button class="action__button action__button--create js-create-loading-btn hide">
         <span class="loading"><i class="fas fa-spinner"></i></span>
       </button>
-      <button class="btn btn-clear cler-btn js-clear-btn">Reset</button>
+      <button class="action__button action__button--clear js-clear-btn">Reset</button>
     </section>
   </main>
-  <footer>
+  <footer class="footer">
       <p>Lang: <a href="./index-ja.html">JP</a></p>
   </footer>
 </body>
