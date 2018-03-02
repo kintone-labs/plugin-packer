@@ -6,7 +6,7 @@
 class View {
   /**
    * @constructor
-   * @param {Object.<string, HTMLElement>} elements
+   * @param {Object<string, HTMLElement>} elements
    */
   constructor(elements) {
     this.$ = elements;

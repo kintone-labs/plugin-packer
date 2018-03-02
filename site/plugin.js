@@ -39,7 +39,7 @@ const createDownloadUrls = result => ({
 
 /**
  * Create download URLs for a plugin and ppk
- * @param {Object.<string, string>} plugin
+ * @param {Object<string, string>} plugin
  */
 const revokePluginUrls = plugin => {
   Object.keys(plugin.url).forEach(key => {
