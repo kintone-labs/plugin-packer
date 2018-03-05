@@ -12,6 +12,7 @@ const View = require('./view');
 const reducer = require('./reducer');
 const {uploadPPK, uploadPlugin, createPluginZip, reset} = require('./action');
 const {generatePluginZip, validatePlugin, revokePluginUrls} = require('./plugin');
+const {zipDirectory} = require('./zip');
 
 const $ppkFileUploader = $('.js-upload-ppk .js-file-upload');
 const $zipFileUploader = $('.js-upload-zip .js-file-upload');
@@ -73,7 +74,13 @@ store.subscribe(() => {
 });
 
 const uploadPluginZipHandler = createFileHanlder(file => {
-  store.dispatch(uploadPlugin(file.name, () => readArrayBuffer(file), validatePlugin));
+  if (Array.isArray(file)) {
+    zipDirectory(file).then(buffer => {
+      store.dispatch(uploadPlugin('plugin.zip', () => Promise.resolve(buffer), validatePlugin));
+    });
+  } else {
+    store.dispatch(uploadPlugin(file.name, () => readArrayBuffer(file), validatePlugin));
+  }
 });
 
 const uploadPPKHanlder = createFileHanlder(file => {

@@ -1,5 +1,7 @@
 'use strict';
 
+const flatten = require('array-flatten');
+
 /**
  * Revoke an object URL
  * @param {string} url
@@ -17,7 +19,38 @@ const createDownloadUrl = (data, type) => URL.createObjectURL(new Blob([data], {
 
 const isDropEvent = e => e.type === 'drop';
 
-const getFileFromEvent = e => (isDropEvent(e) ? e.dataTransfer.files[0] : e.target.files[0]);
+const readEntries = entry =>
+  new Promise(resolve => {
+    if (entry.isDirectory) {
+      entry.createReader().readEntries(childEntries => {
+        Promise.all(childEntries.map(childEntry => readEntries(childEntry))).then(resolve);
+      });
+    } else {
+      entry.file(file => resolve({file, fullPath: entry.fullPath}));
+    }
+  });
+
+const getFileFromEvent = e => {
+  if (!isDropEvent(e)) {
+    return Promise.resolve(e.target.files[0]);
+  }
+  if (
+    typeof e.dataTransfer.items === 'undefined' ||
+    typeof e.dataTransfer.items[0].webkitGetAsEntry !== 'function'
+  ) {
+    return Promise.resolve(e.dataTransfer.files[0]);
+  }
+  return new Promise(resolve => {
+    const entry = e.dataTransfer.items[0].webkitGetAsEntry();
+    if (entry.isFile) {
+      entry.file(resolve);
+    } else {
+      readEntries(entry).then(entries => {
+        resolve(entries);
+      });
+    }
+  });
+};
 
 /**
  * Create an handler for an event to convert a File
@@ -25,14 +58,16 @@ const getFileFromEvent = e => (isDropEvent(e) ? e.dataTransfer.files[0] : e.targ
  * @return {function(e: Event)}
  */
 const createFileHanlder = cb => e => {
-  const file = getFileFromEvent(e);
-  if (!file) {
-    return;
-  }
+  getFileFromEvent(e).then(file => {
+    const files = Array.isArray(file) ? flatten(file) : file;
+    if (!files) {
+      throw new Error('Can not create the file object');
+    }
+    cb(files);
+  });
   if (isDropEvent(e)) {
     e.preventDefault();
   }
-  return cb(file);
 };
 
 /**

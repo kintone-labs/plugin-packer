@@ -42,7 +42,6 @@ const uploadPlugin = (fileName, fileReader, validateManifest) => dispatch => {
     .then(buffer => validateManifest(buffer).then(() => buffer))
     .then(
       buffer => {
-        console.log(buffer);
         dispatch({
           type: UPLOAD_PLUGIN,
           payload: {
