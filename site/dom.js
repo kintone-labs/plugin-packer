@@ -49,6 +49,11 @@ const getFileFromEvent = e => {
     typeof e.dataTransfer.items === 'undefined' ||
     typeof e.dataTransfer.items[0].webkitGetAsEntry !== 'function'
   ) {
+    const file = e.dataTransfer.files[0];
+    // the upload file name doesn't have any dot so we can infer the file is a directory
+    if (file.name.indexOf('.') === -1) {
+      return Promise.reject(new Error("Your browser doesn't support a directory upload"));
+    }
     return Promise.resolve(e.dataTransfer.files[0]);
   }
   return new Promise(resolve => {
@@ -65,20 +70,22 @@ const getFileFromEvent = e => {
 
 /**
  * Create an handler for an event to convert a File
- * @param {function(file: File): Promise<*>} cb
+ * @param {function(promise: Promise<File>): void} cb
  * @return {function(e: Event)}
  */
 const createFileHanlder = cb => e => {
-  getFileFromEvent(e).then(file => {
-    const files = Array.isArray(file) ? flatten(file) : file;
-    if (!files) {
-      throw new Error('Can not create the file object');
-    }
-    cb(files);
-  });
   if (isDropEvent(e)) {
     e.preventDefault();
   }
+  cb(
+    getFileFromEvent(e).then(file => {
+      const files = Array.isArray(file) ? flatten(file) : file;
+      if (!files) {
+        throw new Error('Can not create the file object');
+      }
+      return files;
+    })
+  );
 };
 
 /**
@@ -99,9 +106,10 @@ const readText = file =>
  * @return {Promise<ArrayBuffer>}
  */
 const readArrayBuffer = file =>
-  new Promise(resolve => {
+  new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });
 

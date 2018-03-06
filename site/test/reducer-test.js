@@ -4,12 +4,12 @@ const assert = require('assert');
 
 const reducer = require('../reducer');
 const {
+  UPLOAD_FAILURE,
   UPLOAD_PPK,
   UPLOAD_PLUGIN_START,
   UPLOAD_PLUGIN,
   CREATE_PLUGIN_ZIP_START,
   CREATE_PLUGIN_ZIP,
-  UPLOAD_PLUGIN_FAILURE,
   CREATE_PLUGIN_ZIP_FAILURE,
   RESET,
 } = require('../action');
@@ -152,13 +152,13 @@ describe('reducer', () => {
       });
     });
   });
-  describe('UPLOAD_PLUGIN_FAILURE and CREATE_PLUGIN_ZIP_FAILURE', () => {
+  describe('UPLOAD_FAILURE and CREATE_PLUGIN_ZIP_FAILURE', () => {
     it('should update state.error and update state.loding false', () => {
       const state = {
         error: null,
         loading: true,
       };
-      assert.deepStrictEqual(reducer(state, {type: UPLOAD_PLUGIN_FAILURE, payload: 'error'}), {
+      assert.deepStrictEqual(reducer(state, {type: UPLOAD_FAILURE, payload: 'error'}), {
         error: 'error',
         loading: false,
       });

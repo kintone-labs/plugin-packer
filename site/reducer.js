@@ -2,10 +2,10 @@
 
 const {createDownloadUrls} = require('./plugin');
 const {
+  UPLOAD_FAILURE,
   UPLOAD_PPK,
   UPLOAD_PLUGIN,
   UPLOAD_PLUGIN_START,
-  UPLOAD_PLUGIN_FAILURE,
   CREATE_PLUGIN_ZIP,
   CREATE_PLUGIN_ZIP_START,
   CREATE_PLUGIN_ZIP_FAILURE,
@@ -71,7 +71,7 @@ const reducer = (state = getInitialState(), action) => {
         },
         loading: false,
       });
-    case UPLOAD_PLUGIN_FAILURE:
+    case UPLOAD_FAILURE:
     case CREATE_PLUGIN_ZIP_FAILURE:
       return Object.assign({}, state, {
         error: action.payload,

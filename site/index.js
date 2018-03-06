@@ -10,7 +10,7 @@ const {$, $$, listen, readText, readArrayBuffer, createFileHanlder} = require('.
 const View = require('./view');
 
 const reducer = require('./reducer');
-const {uploadPPK, uploadPlugin, createPluginZip, reset} = require('./action');
+const {uploadPPK, uploadPlugin, createPluginZip, reset, uploadFailure} = require('./action');
 const {generatePluginZip, validatePlugin, revokePluginUrls} = require('./plugin');
 const {zipDirectory} = require('./zip');
 
@@ -73,18 +73,32 @@ store.subscribe(() => {
   view.render(store.getState());
 });
 
-const uploadPluginZipHandler = createFileHanlder(file => {
-  if (Array.isArray(file)) {
-    zipDirectory(file).then(buffer => {
-      store.dispatch(uploadPlugin('plugin.zip', () => Promise.resolve(buffer), validatePlugin));
+const uploadPluginZipHandler = createFileHanlder(promise => {
+  promise
+    .then(file => {
+      // Uploading a directory
+      if (Array.isArray(file)) {
+        zipDirectory(file).then(buffer => {
+          // Should we respect the directory name?
+          store.dispatch(uploadPlugin('plugin.zip', () => Promise.resolve(buffer), validatePlugin));
+        });
+      } else {
+        store.dispatch(uploadPlugin(file.name, () => readArrayBuffer(file), validatePlugin));
+      }
+    })
+    .catch(error => {
+      store.dispatch(uploadFailure(error));
     });
-  } else {
-    store.dispatch(uploadPlugin(file.name, () => readArrayBuffer(file), validatePlugin));
-  }
 });
 
-const uploadPPKHanlder = createFileHanlder(file => {
-  store.dispatch(uploadPPK(file.name, () => readText(file)));
+const uploadPPKHanlder = createFileHanlder(promise => {
+  promise
+    .then(file => {
+      store.dispatch(uploadPPK(file.name, () => readText(file)));
+    })
+    .catch(error => {
+      store.dispatch(uploadFailure(error));
+    });
 });
 
 // Handle a file upload

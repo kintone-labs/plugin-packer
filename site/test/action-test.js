@@ -5,13 +5,14 @@ const sinon = require('sinon');
 
 const {
   UPLOAD_PPK,
+  UPLOAD_FAILURE,
   UPLOAD_PLUGIN,
   UPLOAD_PLUGIN_START,
-  UPLOAD_PLUGIN_FAILURE,
   CREATE_PLUGIN_ZIP,
   CREATE_PLUGIN_ZIP_START,
   CREATE_PLUGIN_ZIP_FAILURE,
   RESET,
+  uploadFailure,
   uploadPPK,
   uploadPlugin,
   reset,
@@ -24,6 +25,15 @@ describe('action', () => {
     dispatch = sinon.spy();
   });
   afterEach(() => {});
+  describe('uploadFailure', () => {
+    it('should dispatch an UPLOAD_FAILURE action with an error', () => {
+      const error = {message: 'error'};
+      assert.deepStrictEqual(uploadFailure(error), {
+        type: UPLOAD_FAILURE,
+        payload: error,
+      });
+    });
+  });
   describe('uploadPPK', () => {
     it('should dispatch an UPLOAD_PPK action with payload including data and name properties', () => {
       const promise = Promise.resolve('value');
@@ -40,6 +50,20 @@ describe('action', () => {
           },
         ]);
       });
+    });
+    it('should dispatch UPLOAD_FAILURE action if fileReader was failure', done => {
+      const promise = Promise.reject('ng');
+      uploadPPK('hoge.ppk', () => promise);
+      promise.then(() => {
+        assert(dispatch.calledOnce);
+        assert.deepStrictEqual(dispatch.getCall(0).args, [
+          {
+            type: UPLOAD_FAILURE,
+            payload: 'ng',
+          },
+        ]);
+      });
+      done();
     });
   });
   describe('uploadPlugin', () => {
@@ -67,7 +91,7 @@ describe('action', () => {
         done();
       });
     });
-    it('should dispatch UPLOAD_PLUGIN_FAILURE action if validateManifest was failure', done => {
+    it('should dispatch UPLOAD_FAILURE action if validateManifest was failure', done => {
       const validateManifestStub = sinon.stub().returns(Promise.reject('error'));
       uploadPlugin('hoge.zip', () => Promise.resolve('ng'), validateManifestStub)(dispatch);
       // In order to guarantee to execute assertion after uploadPlugin has finished
@@ -76,7 +100,7 @@ describe('action', () => {
         assert.equal(validateManifestStub.getCall(0).args[0], 'ng');
         assert.deepStrictEqual(dispatch.getCall(1).args, [
           {
-            type: UPLOAD_PLUGIN_FAILURE,
+            type: UPLOAD_FAILURE,
             payload: 'error',
           },
         ]);
