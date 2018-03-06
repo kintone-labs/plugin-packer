@@ -151,7 +151,8 @@ function rezipContents(zipFile, entries, manifestJson, prefix) {
 
 /**
  * Create a buffer of the zip file
- * @param {File[]} files
+ * @typedef {{file: File, fullPath: string}} FileEntry
+ * @param {File[] | FileEntry[]} files
  * @return {Buffer}
  */
 function zipDirectory(files) {

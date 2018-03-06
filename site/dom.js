@@ -21,8 +21,9 @@ const isDropEvent = e => e.type === 'drop';
 
 /**
  *  Read files from FileSystemEntry
- * @param {FileSystemEntry | FileSystemEntry[]} entry
- * @return {Promise<FileSystemEntry | FileSystemEntry[]>}
+ * @typedef {{file: File, fullPath: string}} FileEntry
+ * @param {FileSystemEntry} entry
+ * @return {Promise<FileEntry | FileEntry[]>}
  * */
 const readEntries = entry =>
   new Promise(resolve => {
@@ -38,7 +39,7 @@ const readEntries = entry =>
 /**
  * Get a file or a file list from Event
  * @param {Event} e
- * @return {Promise<File | FIle[]>}
+ * @return {Promise<File | File[]>}
  */
 const getFileFromEvent = e => {
   if (!isDropEvent(e)) {
