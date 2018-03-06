@@ -5,6 +5,7 @@ const sinon = require('sinon');
 
 const {
   UPLOAD_PPK,
+  UPLOAD_PPK_START,
   UPLOAD_FAILURE,
   UPLOAD_PLUGIN,
   UPLOAD_PLUGIN_START,
@@ -35,12 +36,18 @@ describe('action', () => {
     });
   });
   describe('uploadPPK', () => {
+    it('should dispatch UPLOAD_PPK_START action', () => {
+      const promise = Promise.resolve('value');
+      uploadPPK('hoge.ppk', () => promise)(dispatch);
+      assert(dispatch.calledOnce);
+      assert.deepStrictEqual(dispatch.getCall(0).args, [{type: UPLOAD_PPK_START}]);
+    });
     it('should dispatch an UPLOAD_PPK action with payload including data and name properties', () => {
       const promise = Promise.resolve('value');
       uploadPPK('hoge.ppk', () => promise)(dispatch);
       return promise.then(() => {
-        assert(dispatch.calledOnce);
-        assert.deepStrictEqual(dispatch.getCall(0).args, [
+        assert.equal(dispatch.callCount, 2);
+        assert.deepStrictEqual(dispatch.getCall(1).args, [
           {
             type: UPLOAD_PPK,
             payload: {
@@ -56,7 +63,7 @@ describe('action', () => {
       uploadPPK('hoge.ppk', () => promise);
       promise.then(() => {
         assert(dispatch.calledOnce);
-        assert.deepStrictEqual(dispatch.getCall(0).args, [
+        assert.deepStrictEqual(dispatch.getCall(1).args, [
           {
             type: UPLOAD_FAILURE,
             payload: 'ng',

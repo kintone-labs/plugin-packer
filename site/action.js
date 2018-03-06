@@ -2,6 +2,7 @@
 
 const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+const UPLOAD_PPK_START = 'UPLOAD_PPK_START';
 const UPLOAD_PPK = 'UPLOAD_PPK';
 const UPLOAD_PLUGIN_START = 'UPLOADING_PLUGIN_START';
 const UPLOAD_PLUGIN = 'UPLOAD_PLUGIN';
@@ -28,6 +29,7 @@ const uploadFailure = error => ({
  * @return {function(dispatch: function)}
  */
 const uploadPPK = (fileName, fileReader) => dispatch => {
+  dispatch({type: UPLOAD_PPK_START});
   fileReader().then(
     text => {
       dispatch({
@@ -112,6 +114,7 @@ const reset = () => ({
 module.exports = {
   UPLOAD_FAILURE,
   UPLOAD_PPK,
+  UPLOAD_PPK_START,
   UPLOAD_PLUGIN,
   UPLOAD_PLUGIN_START,
   CREATE_PLUGIN_ZIP,
