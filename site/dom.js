@@ -19,6 +19,11 @@ const createDownloadUrl = (data, type) => URL.createObjectURL(new Blob([data], {
 
 const isDropEvent = e => e.type === 'drop';
 
+/**
+ *  Read files from FileSystemEntry
+ * @param {FileSystemEntry | FileSystemEntry[]} entry
+ * @return {Promise<FileSystemEntry | FileSystemEntry[]>}
+ * */
 const readEntries = entry =>
   new Promise(resolve => {
     if (entry.isDirectory) {
@@ -30,9 +35,15 @@ const readEntries = entry =>
     }
   });
 
+/**
+ * Get a file or a file list from Event
+ * @param {Event} e
+ * @return {Promise<File | FIle[]>}
+ */
 const getFileFromEvent = e => {
   if (!isDropEvent(e)) {
-    return Promise.resolve(e.target.files[0]);
+    const files = e.target.files;
+    return Promise.resolve(files.length > 1 ? Array.from(files) : files[0]);
   }
   if (
     typeof e.dataTransfer.items === 'undefined' ||

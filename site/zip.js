@@ -149,13 +149,19 @@ function rezipContents(zipFile, entries, manifestJson, prefix) {
   });
 }
 
+/**
+ * Create a buffer of the zip file
+ * @param {File[]} files
+ * @return {Buffer}
+ */
 function zipDirectory(files) {
   const zipFile = new yazl.ZipFile();
   return Promise.all(
     files.map(file =>
-      readArrayBuffer(file.file).then(buffer => ({
+      readArrayBuffer(file instanceof File ? file : file.file).then(buffer => ({
         buffer,
-        path: file.fullPath.replace(/^\/[^/]+?\//, ''),
+        path:
+          file instanceof File ? file.webkitRelativePath : file.fullPath.replace(/^\/[^/]+?\//, ''),
       }))
     )
   )
