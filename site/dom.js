@@ -26,13 +26,15 @@ const isDropEvent = e => e.type === 'drop';
  * @return {Promise<FileEntry | FileEntry[]>}
  * */
 const readEntries = entry =>
-  new Promise(resolve => {
-    if (entry.isDirectory) {
+  new Promise((resolve, reject) => {
+    if (entry.isFile) {
+      entry.file(file => resolve({file, fullPath: entry.fullPath}));
+    } else if (entry.isDirectory) {
       entry.createReader().readEntries(childEntries => {
         Promise.all(childEntries.map(childEntry => readEntries(childEntry))).then(resolve);
       });
     } else {
-      entry.file(file => resolve({file, fullPath: entry.fullPath}));
+      reject(new Error('Unsupported file system entry specified'));
     }
   });
 
@@ -57,14 +59,16 @@ const getFileFromEvent = e => {
     }
     return Promise.resolve(e.dataTransfer.files[0]);
   }
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     const entry = e.dataTransfer.items[0].webkitGetAsEntry();
     if (entry.isFile) {
       entry.file(resolve);
-    } else {
+    } else if (entry.isDirectory) {
       readEntries(entry).then(entries => {
         resolve(entries);
       });
+    } else {
+      reject(new Error('Unsupported file system entry specified'));
     }
   });
 };
