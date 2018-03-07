@@ -21,7 +21,7 @@ const isDropEvent = e => e.type === 'drop';
 
 /**
  *  Read files from FileSystemEntry
- * @typedef {{path: string, fiel: File}} FileEntry
+ * @typedef {{path: string, file: File}} FileEntry
  * @param {FileSystemEntry} entry
  * @return {Promise<FileEntry | FileEntry[]>}
  * */
