@@ -60,7 +60,7 @@ const getFileFromEvent = e => {
     // We assume a string was dropped if we can't get the File object
     const file = e.dataTransfer.files[0];
     if (!file) {
-      return Promise.reject(new Error('Please upload a directory or zipped file'));
+      return Promise.reject(new Error('Unsupported file type item specified'));
     }
     // the upload file name doesn't have any dot so we can infer the file is a directory
     if (file.name.indexOf('.') === -1) {
@@ -71,7 +71,7 @@ const getFileFromEvent = e => {
   return new Promise((resolve, reject) => {
     const dataTransferItem = e.dataTransfer.items[0];
     if (dataTransferItem.kind !== 'file') {
-      reject(new Error('Please upload a directory or zipped file'));
+      reject(new Error('Unsupported file type item specified'));
       return;
     }
     const entry = dataTransferItem.webkitGetAsEntry();
