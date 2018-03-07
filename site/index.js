@@ -77,7 +77,7 @@ const uploadPluginZipHandler = createFileHanlder(promise => {
   promise
     .then(file => {
       // Uploading a directory
-      if (Array.isArray(file)) {
+      if (file instanceof Map) {
         zipDirectory(file).then(buffer => {
           // Should we respect the directory name?
           store.dispatch(uploadPlugin('plugin.zip', () => Promise.resolve(buffer), validatePlugin));
@@ -94,7 +94,12 @@ const uploadPluginZipHandler = createFileHanlder(promise => {
 const uploadPPKHanlder = createFileHanlder(promise => {
   promise
     .then(file => {
-      store.dispatch(uploadPPK(file.name, () => readText(file)));
+      // Uploading a directory
+      if (file instanceof Map) {
+        store.dispatch(uploadFailure(new Error('secret file should be a text file')));
+      } else {
+        store.dispatch(uploadPPK(file.name, () => readText(file)));
+      }
     })
     .catch(error => {
       store.dispatch(uploadFailure(error));

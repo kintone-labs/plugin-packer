@@ -21,14 +21,15 @@ const isDropEvent = e => e.type === 'drop';
 
 /**
  *  Read files from FileSystemEntry
- * @typedef {{file: File, fullPath: string}} FileEntry
+ * @typedef {{path: string, fiel: File}} FileEntry
  * @param {FileSystemEntry} entry
  * @return {Promise<FileEntry | FileEntry[]>}
  * */
 const readEntries = entry =>
   new Promise((resolve, reject) => {
     if (entry.isFile) {
-      entry.file(file => resolve({file, fullPath: entry.fullPath}));
+      // Convert the fullPath to the relative path from the plugin directory
+      entry.file(file => resolve({path: entry.fullPath.replace(/^\/[^/]+?\//, ''), file}));
     } else if (entry.isDirectory) {
       entry.createReader().readEntries(childEntries => {
         Promise.all(childEntries.map(childEntry => readEntries(childEntry))).then(resolve);
@@ -41,12 +42,16 @@ const readEntries = entry =>
 /**
  * Get a file or a file list from Event
  * @param {Event} e
- * @return {Promise<File | File[]>}
+ * @return {Promise<File | Map<string, File>>}
  */
 const getFileFromEvent = e => {
   if (!isDropEvent(e)) {
     const files = e.target.files;
-    return Promise.resolve(files.length > 1 ? Array.from(files) : files[0]);
+    if (files.length === 1) {
+      return Promise.resolve(files[0]);
+    }
+    // Create a Map<path, File>
+    return Promise.resolve(new Map(Array.from(files).map(file => [file.webkitRelativePath, file])));
   }
   if (
     typeof e.dataTransfer.items === 'undefined' ||
@@ -74,7 +79,8 @@ const getFileFromEvent = e => {
       entry.file(resolve);
     } else if (entry.isDirectory) {
       readEntries(entry).then(entries => {
-        resolve(entries);
+        // Create a Map<path, File>
+        resolve(new Map(flatten(entries).map(({path, file}) => [path, file])));
       });
     } else {
       reject(new Error('Unsupported file system entry specified'));
@@ -91,15 +97,7 @@ const createFileHanlder = cb => e => {
   if (isDropEvent(e)) {
     e.preventDefault();
   }
-  cb(
-    getFileFromEvent(e).then(file => {
-      const files = Array.isArray(file) ? flatten(file) : file;
-      if (!files) {
-        throw new Error('Can not create the file object');
-      }
-      return files;
-    })
-  );
+  cb(getFileFromEvent(e));
 };
 
 /**
