@@ -52,15 +52,24 @@ const getFileFromEvent = e => {
     typeof e.dataTransfer.items === 'undefined' ||
     typeof e.dataTransfer.items[0].webkitGetAsEntry !== 'function'
   ) {
+    // We assume a string was dropped if we can't get the File object
     const file = e.dataTransfer.files[0];
+    if (!file) {
+      return Promise.reject(new Error('Please upload a directory or zipped file'));
+    }
     // the upload file name doesn't have any dot so we can infer the file is a directory
     if (file.name.indexOf('.') === -1) {
       return Promise.reject(new Error("Your browser doesn't support a directory upload"));
     }
-    return Promise.resolve(e.dataTransfer.files[0]);
+    return Promise.resolve(file);
   }
   return new Promise((resolve, reject) => {
-    const entry = e.dataTransfer.items[0].webkitGetAsEntry();
+    const dataTransferItem = e.dataTransfer.items[0];
+    if (dataTransferItem.kind !== 'file') {
+      reject(new Error('Please upload a directory or zipped file'));
+      return;
+    }
+    const entry = dataTransferItem.webkitGetAsEntry();
     if (entry.isFile) {
       entry.file(resolve);
     } else if (entry.isDirectory) {
