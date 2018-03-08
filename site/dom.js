@@ -52,8 +52,8 @@ const getFileFromEvent = e => {
     }
     // Create a Map<path, File>
     return Promise.resolve({
-      // We can't get the uploaded directory name.
-      name: 'plugin',
+      // Get a uploaded directory name from webkitRelativePath
+      name: files[0].webkitRelativePath.replace(/\/.*/, ''),
       entries: new Map(Array.from(files).map(file => [file.webkitRelativePath, file])),
     });
   }
