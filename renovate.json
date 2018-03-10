@@ -1,0 +1,11 @@
+{
+  "extends": ["config:base", "schedule:daily"],
+  "separatePatchReleases": true,
+  "patch": {
+    "automerge": true
+  },
+  "pinVersions": false,
+  "timezone": "Asia/Tokyo",
+  "unpublishSafe": true,
+  "upgradeInRange": true
+}
