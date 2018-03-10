@@ -1,5 +1,6 @@
 {
-  "extends": ["config:base"],
+  "extends": ["config:base", "group:all", "schedule:daily"],
   "pinVersions": false,
-  "upgradeInRange": true
+  "upgradeInRange": true,
+  "timezone": "Asia/Tokyo"
 }
