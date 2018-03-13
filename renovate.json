@@ -4,6 +4,7 @@
     ":separatePatchReleases",
     ":automergePatch",
     ":maintainLockFilesMonthly",
+    ":prConcurrentLimit10",
     ":preserveSemverRanges",
     ":unpublishSafe"
   ],
