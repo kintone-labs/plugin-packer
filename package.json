@@ -25,7 +25,8 @@
     "site": "run-p js css",
     "site:dev": "run-p css js:dev",
     "site:test": "mocha site/test --require site/test/setup.js",
-    "test": "run-s eslint mocha site:test"
+    "test": "run-s eslint mocha site:test",
+    "tsc": "tsc"
   },
   "dependencies": {
     "@teppeis/kintone-plugin-manifest-validator": "^0.6.1",
@@ -59,6 +60,7 @@
     "rimraf": "^2.6.2",
     "setimmediate": "^1.0.5",
     "sinon": "^4.4.6",
+    "typescript": "^2.8.0-rc",
     "webpack": "^4.1.1",
     "webpack-cli": "^2.0.12",
     "webpack-dev-server": "^3.1.1",
