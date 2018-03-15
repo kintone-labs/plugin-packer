@@ -4,9 +4,9 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const AdmZip = require('adm-zip');
-const denodeify = require('denodeify');
+const promisify = require('util.promisify');
 
-const rimraf = denodeify(require('rimraf'));
+const rimraf = promisify(require('rimraf'));
 const sinon = require('sinon');
 const glob = require('glob');
 

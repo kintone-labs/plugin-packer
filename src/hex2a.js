@@ -1,3 +1,5 @@
+// @ts-check
+
 'use strict';
 
 const N_TO_A = 'a'.charCodeAt(0) - '0'.charCodeAt(0);

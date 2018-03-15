@@ -1,3 +1,5 @@
+// @ts-check
+
 'use strict';
 
 const ZipFile = require('yazl').ZipFile;
@@ -10,12 +12,15 @@ const uuid = require('./uuid');
 
 /**
  * @param {!Buffer} contentsZip The zipped plugin contents directory.
- * @param {string=} privateKey The private key (PKCS#1 PEM).
+ * @param {string=} opt_privateKey The private key (PKCS#1 PEM).
  * @return {!Promise<{plugin: !Buffer, privateKey: string, id: string}>}
  */
-function packer(contentsZip, privateKey) {
+function packer(contentsZip, opt_privateKey) {
+  /** @type {RSA} */
   let key;
-  if (privateKey) {
+  let privateKey = '';
+  if (opt_privateKey) {
+    privateKey = opt_privateKey;
     key = new RSA(privateKey);
   } else {
     debug('generating a new key');
@@ -46,6 +51,7 @@ function zip(contentsZip, publicKey, signature) {
   return new Promise((res, rej) => {
     const output = new streamBuffers.WritableStreamBuffer();
     const zipFile = new ZipFile();
+    /** @type {number?} */
     let size = null;
     output.on('finish', () => {
       debug(`plugin.zip: ${size} bytes`);

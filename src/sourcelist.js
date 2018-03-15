@@ -1,3 +1,5 @@
+// @ts-check
+
 'use strict';
 
 /**
@@ -14,16 +16,17 @@ function sourceList(manifest) {
     ['config', 'js'],
     ['config', 'css'],
   ];
+  /** @type {Array<string>} */
   const list = sourceTypes
-    .map(t => manifest[t[0]] && manifest[t[0]][t[1]])
+    .map(([type, ext]) => manifest[type] && manifest[type][ext])
     .filter(i => !!i)
-    .reduce((a, b) => a.concat(b), [])
-    .filter(file => !/^https?:\/\//.test(file));
+    .reduce((a, b) => a.concat(b), []);
+  const localSources = list.filter(file => !/^https?:\/\//.test(file));
   if (manifest.config && manifest.config.html) {
-    list.push(manifest.config.html);
+    localSources.push(manifest.config.html);
   }
-  list.push('manifest.json', manifest.icon);
-  return list;
+  localSources.push('manifest.json', manifest.icon);
+  return localSources;
 }
 
 module.exports = sourceList;

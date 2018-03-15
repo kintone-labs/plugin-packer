@@ -1,12 +1,14 @@
+// @ts-check
+
 'use strict';
 
 const path = require('path');
 const fs = require('fs');
 const chokidar = require('chokidar');
-const denodeify = require('denodeify');
+const promisify = require('util.promisify');
 
-const writeFile = denodeify(fs.writeFile);
-const mkdirp = denodeify(require('mkdirp'));
+const writeFile = promisify(fs.writeFile);
+const mkdirp = promisify(require('mkdirp'));
 const debug = require('debug')('cli');
 const validate = require('@teppeis/kintone-plugin-manifest-validator');
 
@@ -52,6 +54,7 @@ function cli(pluginDir, options) {
 
       // 4. generate new ppk if not specified
       const ppkFile = options.ppk;
+      /** @type {string?} */
       let privateKey;
       if (ppkFile) {
         debug(`loading an existing key: ${ppkFile}`);
@@ -120,7 +123,7 @@ function throwIfInvalidManifest(manifest, pluginDir) {
  * @return {!Promise<string>} The value is output path of plugin.zip.
  */
 function outputPlugin(outputPath, plugin) {
-  return writeFile(outputPath, plugin).then(arg => outputPath);
+  return writeFile(outputPath, plugin).then(() => outputPath);
 }
 
 /**

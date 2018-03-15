@@ -3,7 +3,7 @@
 const path = require('path');
 const yazl = require('yazl');
 const yauzl = require('yauzl');
-const denodeify = require('denodeify');
+const promisify = require('util.promisify');
 const validate = require('@teppeis/kintone-plugin-manifest-validator');
 const streamBuffers = require('stream-buffers');
 
@@ -47,7 +47,7 @@ function rezip(contentsZip) {
  * @return {!Promise<{zipFile: !yauzl.ZipFile, entries: !Map<string, !yauzl.ZipEntry>}>}
  */
 function zipEntriesFromBuffer(contentsZip) {
-  return denodeify(yauzl.fromBuffer)(contentsZip).then(
+  return promisify(yauzl.fromBuffer)(contentsZip).then(
     zipFile =>
       new Promise((res, rej) => {
         const entries = new Map();
@@ -135,7 +135,7 @@ function rezipContents(zipFile, entries, manifestJson, prefix) {
       res(output.getContents());
     });
     newZipFile.outputStream.pipe(output);
-    const openReadStream = denodeify(zipFile.openReadStream.bind(zipFile));
+    const openReadStream = promisify(zipFile.openReadStream.bind(zipFile));
     Promise.all(
       sourceList(manifestJson).map(src => {
         const entry = entries.get(path.join(prefix, src));

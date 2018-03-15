@@ -1,3 +1,5 @@
+// @ts-check
+
 'use strict';
 
 const RSA = require('node-rsa');

@@ -1,3 +1,5 @@
+// @ts-check
+
 'use strict';
 
 const path = require('path');
@@ -19,6 +21,7 @@ function createContentsZip(pluginDir, manifest) {
   return new Promise((res, rej) => {
     const output = new streamBuffers.WritableStreamBuffer();
     const zipFile = new ZipFile();
+    /** @type {number?} */
     let size = null;
     output.on('finish', () => {
       debug(`plugin.zip: ${size} bytes`);
