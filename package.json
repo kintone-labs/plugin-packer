@@ -42,6 +42,7 @@
   "devDependencies": {
     "@types/chokidar": "^1.7.5",
     "@types/debug": "^0.0.30",
+    "@types/meow": "^4.0.1",
     "@types/mkdirp": "^0.5.2",
     "@types/node": "^6.0.102",
     "@types/stream-buffers": "^3.0.2",

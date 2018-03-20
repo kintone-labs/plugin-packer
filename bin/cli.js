@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+// @ts-check
 
 'use strict';
 
@@ -41,10 +42,12 @@ if (!cli.input[0]) {
 }
 
 const pluginDir = cli.input[0];
-const flags = Object.keys(flagSpec).reduce((prev, cur) => {
+/** @type {!Object} */
+const flags = {};
+Object.keys(flagSpec).reduce((prev, cur) => {
   prev[cur] = cli.flags[cur];
   return prev;
-}, {});
+}, flags);
 
 if (process.env.NODE_ENV === 'test') {
   console.log(JSON.stringify({pluginDir, flags}));
