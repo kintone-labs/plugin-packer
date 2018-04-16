@@ -116,11 +116,13 @@ function getManifestJsonFromEntry(zipFile, zipEntry) {
  * @throws if manifest.json is invalid
  */
 function validateManifest(entries, manifestJson, manifestPath) {
-  const manifestPrefix = path.dirname(manifestPath);
+  // entry.fileName is a relative path separated by posix style(/) so this makes separators always posix style.
+  const getEntryKey = filePath =>
+    path.join(path.dirname(manifestPath), filePath).replace(new RegExp(`\\${path.sep}`, 'g'), '/');
   const result = validate(manifestJson, {
-    relativePath: filePath => entries.has(path.join(manifestPrefix, filePath)),
+    relativePath: filePath => entries.has(getEntryKey(filePath)),
     maxFileSize(maxBytes, filePath) {
-      const entry = entries.get(path.join(manifestPrefix, filePath));
+      const entry = entries.get(getEntryKey(filePath));
       if (entry) {
         return entry.uncompressedSize <= maxBytes;
       }
