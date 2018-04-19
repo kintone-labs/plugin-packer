@@ -71,7 +71,12 @@ function cli(pluginDir, options) {
         }
 
         if (options.watch) {
-          const watcher = chokidar.watch(pluginDir);
+          const watcher = chokidar.watch(pluginDir, {
+            awaitWriteFinish: {
+              stabilityThreshold: 1000,
+              pollInterval: 250,
+            },
+          });
           watcher.on('change', () => {
             cli(pluginDir, Object.assign({}, options, {watch: false}));
           });
