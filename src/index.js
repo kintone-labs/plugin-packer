@@ -46,7 +46,7 @@ function packer(contentsZip, privateKey) {
  * @return {!Promise<!Buffer>}
  */
 function zip(contentsZip, publicKey, signature) {
-  debug(`zip() start`);
+  debug(`zip(): start`);
   return new Promise((res, rej) => {
     const output = new streamBuffers.WritableStreamBuffer();
     const zipFile = new ZipFile();
