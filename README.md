@@ -34,7 +34,6 @@ $ kintone-plugin-packer [OPTIONS] PLUGIN_DIR
 - `--out PLUGIN_FILE`: The path of generated plugin file. The default is `plugin.zip` in the same directory of `PLUGIN_DIR`.
 - `--watch`, `-w`: Watch PLUGIN_DIR for the changes.
 
-
 ## How to use with `npm run`
 
 If your private key is `./private.ppk` and the plugin directory is `./plugin`, edit `package.json`:
