@@ -46,7 +46,7 @@
     "array-flatten": "^2.1.1",
     "cssnano-cli": "^1.0.5",
     "eslint": "^5.0.1",
-    "eslint-config-teppeis": "^7.0.1",
+    "eslint-config-teppeis": "^8.2.0",
     "execa": "^1.0.0",
     "glob": "^7.1.3",
     "husky": "^0.15.0-rc.13",
