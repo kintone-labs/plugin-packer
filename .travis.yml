@@ -8,3 +8,7 @@ node_js:
 cache:
   directories:
     - "node_modules"
+# running tests only when pushing a commit in master except PRs
+branches:
+  only:
+  - master
