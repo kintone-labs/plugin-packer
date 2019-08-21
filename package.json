@@ -31,7 +31,7 @@
   },
   "dependencies": {
     "@kintone/plugin-manifest-validator": "^2.0.2",
-    "chokidar": "^2.1.6",
+    "chokidar": "^3.0.2",
     "debug": "^4.1.1",
     "denodeify": "^1.2.1",
     "meow": "^5.0.0",
@@ -63,7 +63,7 @@
     "sinon": "^7.4.1",
     "standard-version": "^5.0.2",
     "webpack": "^4.39.2",
-    "webpack-cli": "^3.3.6",
+    "webpack-cli": "^3.3.7",
     "webpack-dev-server": "^3.8.0"
   },
   "homepage": "https://github.com/kintone/plugin-packer",
