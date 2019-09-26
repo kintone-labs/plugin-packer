@@ -30,7 +30,7 @@
     "test": "run-s eslint mocha site:test"
   },
   "dependencies": {
-    "@kintone/plugin-manifest-validator": "^2.0.4",
+    "@kintone/plugin-manifest-validator": "^2.0.5",
     "chokidar": "^3.0.2",
     "debug": "^4.1.1",
     "denodeify": "^1.2.1",
@@ -42,7 +42,7 @@
     "yazl": "^2.5.1"
   },
   "devDependencies": {
-    "@cybozu/eslint-config": "^7.0.0",
+    "@cybozu/eslint-config": "^7.1.0",
     "array-flatten": "^2.1.2",
     "cssnano-cli": "^1.0.5",
     "eslint": "^6.3.0",
@@ -62,7 +62,7 @@
     "setimmediate": "^1.0.5",
     "sinon": "^7.5.0",
     "standard-version": "^7.0.0",
-    "webpack": "^4.40.2",
+    "webpack": "^4.41.0",
     "webpack-cli": "^3.3.9",
     "webpack-dev-server": "^3.8.1"
   },
