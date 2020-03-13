@@ -17,7 +17,7 @@
   ],
   "scripts": {
     "circleci": "run-s test",
-    "css": "postcss node_modules/normalize.css/normalize.css --safe > docs/dist/normalize.min.css",
+    "css": "postcss node_modules/normalize.css/normalize.css > docs/dist/normalize.min.css",
     "eslint": "eslint *.js bin src site test",
     "js": "webpack --mode production",
     "js:dev": "webpack-dev-server --mode development",
