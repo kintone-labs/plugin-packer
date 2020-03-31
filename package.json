@@ -1,7 +1,7 @@
 {
   "name": "@kintone/plugin-packer",
   "description": "Package your kintone plugin with pure JavaScript",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "author": "Teppei Sato <teppeis@gmail.com>",
   "engines": {
     "node": ">=10"
@@ -30,19 +30,19 @@
     "test": "run-s eslint mocha site:test"
   },
   "dependencies": {
-    "@kintone/plugin-manifest-validator": "^3.0.1",
+    "@kintone/plugin-manifest-validator": "^3.0.2",
     "chokidar": "^3.3.1",
     "debug": "^4.1.1",
     "denodeify": "^1.2.1",
     "meow": "^6.1.0",
     "mkdirp": "^1.0.3",
-    "node-rsa": "~1.0.7",
+    "node-rsa": "~1.0.8",
     "stream-buffers": "^3.0.2",
     "yauzl": "^2.10.0",
     "yazl": "^2.5.1"
   },
   "devDependencies": {
-    "@cybozu/eslint-config": "^10.0.1",
+    "@cybozu/eslint-config": "^10.0.2",
     "array-flatten": "^3.0.0",
     "cssnano": "^4.1.10",
     "eslint": "^6.8.0",
@@ -61,9 +61,9 @@
     "redux-thunk": "^2.3.0",
     "rimraf": "^3.0.2",
     "setimmediate": "^1.0.5",
-    "sinon": "^8.1.1",
+    "sinon": "^9.0.1",
     "standard-version": "^7.1.0",
-    "webpack": "^4.42.0",
+    "webpack": "^4.42.1",
     "webpack-cli": "^3.3.11",
     "webpack-dev-server": "^3.10.3"
   },
