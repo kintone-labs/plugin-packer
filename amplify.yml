@@ -1,0 +1,17 @@
+version: 1
+frontend:
+  phases:
+    # IMPORTANT - Please verify your build commands
+    preBuild:
+      commands:
+        - npm install
+    build:
+      commands:
+        - npm run site
+  artifacts:
+    baseDirectory: docs
+    files:
+      - '**/*'
+  cache:
+    paths:
+      - node_modules/**/*
